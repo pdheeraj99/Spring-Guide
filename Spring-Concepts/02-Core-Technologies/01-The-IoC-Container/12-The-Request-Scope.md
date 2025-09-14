@@ -68,7 +68,7 @@ graph TD
         subgraph "Step 1: Create Real Bean"
             RealBean["Real RequestDataHolder Bean<br/>(Created for this request ONLY)"];
             Req -- "Spring injects the request<br/>into the bean's constructor" --> RealBean;
-            RealBean -- "Pulls 'abc-123' from header<br/>and stores it" --> Data([trackingId = "abc-123"]);
+            RealBean -- "Pulls 'abc-123' from header<br/>and stores it" --> Data["Stored Data:<br/>trackingId = 'abc-123'"];
         end
 
         subgraph "Step 2: The Service Layer"
