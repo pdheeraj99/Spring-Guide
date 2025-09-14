@@ -28,6 +28,20 @@ Kani, nuvvu rojantha coffee machine ni pattukuni tiragavu kada? 😂 So, `Person
 
 `@DependsOn` anedi ee secret handshake anamata. `Person` bean tho manam Spring ki cheptunnam, "Hey, nannu create chese mundu, first aa 'coffeeMaker' bean pani kanivvu. Adi ayyake nenu scene loki vasta."
 
+```mermaid
+graph TD
+    subgraph "Direct Dependency (Injection)"
+        A[UserService] -->|injects| B(UserRepository);
+    end
+
+    subgraph "Indirect Dependency (Initialization Order)"
+        C[DataProcessor] -.->|@DependsOn("dbInitializer")| D(DatabaseInitializer);
+    end
+
+    style C fill:#f9f,stroke:#333,stroke-width:2px
+    style D fill:#ccf,stroke:#333,stroke-width:2px
+```
+
 **How to use it in Java Config?**
 Simple ga `@DependsOn` annotation ni `@Bean` method meeda pettadame.
 
