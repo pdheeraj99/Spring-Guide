@@ -1,26 +1,30 @@
 package io.mawa.spring.core.scopes.request;
 
-import org.springframework.context.annotation.Scope;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import java.time.LocalDateTime;
 
 @Component
 @RequestScope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class RequestScopeBean {
 
-    private final String creationTime = LocalDateTime.now().toString();
+    private final String userAgent;
 
-    public RequestScopeBean() {
-        System.out.println("--- RequestScopeBean CREATED! --- Time: " + creationTime + ", HashCode: " + this.hashCode() + " ✨");
+    @Autowired
+    public RequestScopeBean(HttpServletRequest request) {
+        System.out.println("--- REAL RequestScopeBean CREATED! --- HashCode: " + this.hashCode() + " ✨");
+        // We are pulling data FROM the HTTP request and storing it in our bean.
+        this.userAgent = request.getHeader("User-Agent");
+        System.out.println("Request User-Agent captured: " + this.userAgent);
     }
 
-    public String getCreationTime() {
-        return creationTime;
+    public String getUserAgent() {
+        return userAgent;
     }
 
     @PostConstruct
