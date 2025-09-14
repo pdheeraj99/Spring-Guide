@@ -22,16 +22,12 @@ public class RequestScopeController {
     @GetMapping("/request-scope")
     public Map<String, String> getRequestScopeDetails() {
         System.out.println("\n--- Handling /request-scope endpoint ---");
-
         Map<String, String> response = new HashMap<>();
 
-        System.out.println("First call to get bean details in this request...");
-        response.put("firstCallTime", requestScopeBean.getCreationTime());
-        response.put("firstCallHashCode", String.valueOf(requestScopeBean.hashCode()));
-
-        System.out.println("Second call to get bean details in this request...");
-        response.put("secondCallTime", requestScopeBean.getCreationTime());
-        response.put("secondCallHashCode", String.valueOf(requestScopeBean.hashCode()));
+        // We call the bean twice to prove it's the same instance within one request.
+        // The proxy forwards these calls to the same REAL bean for this request.
+        response.put("beanInstance", requestScopeBean.toString());
+        response.put("userAgent", requestScopeBean.getUserAgent());
 
         System.out.println("--- Finished handling /request-scope endpoint ---");
         return response;
