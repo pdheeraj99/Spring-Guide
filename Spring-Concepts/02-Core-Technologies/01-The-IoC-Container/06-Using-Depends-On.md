@@ -35,7 +35,7 @@ graph TD
     end
 
     subgraph "Indirect Dependency (Initialization Order)"
-        C[DataProcessor] -.->|@DependsOn("dbInitializer")| D(DatabaseInitializer);
+        C[DataProcessor] -. "@DependsOn" .-> D(DatabaseInitializer);
     end
 
     style C fill:#f9f,stroke:#333,stroke-width:2px
