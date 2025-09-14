@@ -22,8 +22,10 @@ The flow looks like this:
 ```mermaid
 graph LR
     subgraph "Your Code"
-        A[App Classes <br/>(POJOs like MyService)]
-        B[Config Metadata <br/>(@Configuration, @ComponentScan)]
+        A["App Classes
+(POJOs like MyService)"]
+        B["Config Metadata
+(@Configuration, @ComponentScan)"]
     end
 
     subgraph "Spring Framework"
@@ -31,7 +33,8 @@ graph LR
     end
 
     subgraph "Result ✨"
-        D[Fully Configured <br/> & Executable App]
+        D["Fully Configured
+& Executable App"]
     end
 
     A -- "feeds into" --> C
