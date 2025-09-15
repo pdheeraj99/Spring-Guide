@@ -11,6 +11,8 @@ import java.util.Arrays;
 @SpringBootApplication
 @ComponentScan(basePackages = {
     "io.mawa.spring.core.scopes.request",
+    "io.mawa.spring.core.scopes.session",
+    "io.mawa.spring.core.scopes.application",
     "io.mawa.spring.realworld"
 })
 public class WebApp {
