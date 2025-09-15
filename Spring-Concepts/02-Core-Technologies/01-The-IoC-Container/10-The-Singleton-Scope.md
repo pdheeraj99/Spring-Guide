@@ -12,30 +12,39 @@ Perulo ne undi kada, "Single" ani. Ante, oka particular bean type ki, Spring IoC
 
 Idi Spring lo **default scope**. Ante, nuvvu emi cheppakapothe, Spring prathi bean ni singleton ga ne treat chestundi.
 
-### The College Principal Analogy 👨‍🏫
-Imagine mana Spring Container anedi oka college anuko.
-*   **Singleton Bean (`Principal`):** College ki entha mandi students unna, HODs unna, principal okkare untaru. Evaru vachi "Principal evaru?" ani adigina, manam ade okka person ni chupistam. He is the single, shared instance for the entire college.
-*   **Other Beans (`Student`):** Students chala mandi untaru, prathi student veru. Idi vere scope (like prototype), daani gurinchi tarvata matladukundam.
+### The "One Shared Resource" Analogy
+Imagine oka application lo, multiple services ki database tho matladali. Prati service ki kotha database connection pool create cheyadam chala expensive. Anduke, manam oke okka `DataSource` bean ni create chesi, daanni andari tho share chestam. This is the perfect use case for a singleton.
 
 ```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
 graph TD
-    subgraph "Spring Container (Our College)"
-        P(Principal Office)
-        P -- "One & Only" --> Principal["👨‍🏫 Principal Bean (Singleton)"];
+    subgraph "Spring Container"
+        DS["`DataSource` Bean<br>(Singleton)<br/>ID: #123"];
+
+        subgraph "Other Beans"
+            A["OrderService"];
+            B["UserService"];
+            C["ProductController"];
+        end
     end
 
-    subgraph "Different Departments"
-        S1["Student Affairs Office"] -->|asks for| P;
-        S2["Admissions Office"] -->|asks for| P;
-        S3["Exam Branch"] -->|asks for| P;
-    end
+    A -- "injects" --> DS;
+    B -- "injects" --> DS;
+    C -- "injects" --> DS;
 
-    style Principal fill:#f9f,stroke:#333,stroke-width:2px
+    style DS fill:#552,stroke:#ff8,color:#fff
 ```
-Ee diagram lo, college lo unna anni departments ki, oke okka Principal bean instance serve chestondi.
+Ee diagram lo, `OrderService`, `UserService`, and `ProductController` anni veru veru beans, kani vaati annitiki oke okka `DataSource` object (ID: #123) instance inject avtundi.
 
 ### Why is it the Default?
-Most of the time, mana application lo beans ki state undadu (stateless). For example, services, repositories, controllers. Veetiki data ni store cheskune pani undadu, just logic execute chestayi. Alantappudu, prathi request ki kotha object create cheyadam anavasaram. Oke object ni andaru share cheskunte, memory save avutundi, performance better avutundi. Anduke, singleton anedi chala efficient and default choice.
+Most of the time, mana application lo beans ki state undadu (stateless). For example, services, repositories, controllers. Veetiki instance variables undavu (or final matrame untayi). They just have behavior (methods). Alantappudu, prathi sari kotha object create cheyadam anavasaramaina pani. Oke object ni andaru share cheskunte, memory save avutundi, performance better avutundi. Anduke, singleton anedi chala efficient and default choice.
+
+### Spring Singleton vs. GoF Singleton (A Classic Interview Question!)
+Mawa, idi chala important interview question.
+*   **Gang of Four (GoF) Singleton:** Idi classic design pattern. Deenilo, aa class design eh ala untundi, antha JVM lo, aa class ki oke okka object create avvagaladu. Idi `private constructor` and `static getInstance()` method use chesi achieve chestaru. The scope is per `ClassLoader`.
+*   **Spring Singleton:** Idi different. Spring lo, bean anedi POJO (Plain Old Java Object). Daaniki private constructor undalsina avasaram ledu. The "singleton-ness" is controlled by the **container**, not the class itself. Spring just makes sure to create only one instance **per container** for a given bean definition.
+
+**The Main Difference:** Spring singleton is more flexible. The same class can be a singleton in one context and a prototype in another, just by changing the configuration. GoF singleton is hard-coded into the class design.
 
 ### How to Declare a Singleton?
 As I said, idi default. So nuvvu emi cheyanakkarledu.

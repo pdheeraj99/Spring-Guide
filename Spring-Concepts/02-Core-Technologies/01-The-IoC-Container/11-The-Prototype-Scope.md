@@ -10,48 +10,65 @@ Prototype ante "a new one every time". Ante, nuvvu oka bean ni prototype ga defi
 
 Singleton lo laaga, same object ni malli malli ivvadu. Prati sari kotha piece!
 
-### The Buffet Plate Analogy 🍽️
-Imagine manam oka grand buffet ki vellam.
-*   **Singleton Bean (The Serving Spoon):** Akkada unna curry bowl lo, andaru oke okka serving spoon ni share cheskuntaru. Adi singleton.
-*   **Prototype Bean (The Plates):** Buffet line start lo, pedda stack of plates untayi. Prati person vachi, oka kotha, clean plate teeskuntaru. Evaru పాత plate ni vadaru. Ee stack of plates eh mana prototype bean definition. Nuvvu adiginapudalla, neeku oka kotha plate vastundi.
+### The Vending Machine Analogy 🥤
+Imagine a vending machine for soda cans.
+*   **The Vending Machine (The Spring Container):** The machine itself.
+*   **The Blueprint (The `PrototypeBean.java` file):** The recipe for a soda can stored inside the machine.
+*   **The Action (calling `context.getBean()`):** You press a button on the machine.
+*   **The Result (The Object):** The machine creates a **brand new, physical soda can** and drops it for you. It's yours now. The machine doesn't care what you do with it. If you press the button again, you get another, completely new can.
 
 ```mermaid
-graph TD
-    subgraph "Spring Container (The Buffet)"
-        A["@Bean @Scope('prototype')
-           Plate plate()"]
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
+graph LR
+    subgraph Your Code
+        A[You] -- "1. context.getBean(Soda.class)" --> B{Vending Machine<br>(Spring Container)};
+        B -- "2. Creates NEW Soda Can" --> C(🥤 Soda Can #1);
+        A -- "3. context.getBean(Soda.class)" --> B;
+        B -- "4. Creates NEW Soda Can" --> D(🥤 Soda Can #2);
     end
-
-    subgraph "Guests (Your Code)"
-        B(Guest 1) -->|asks for a plate| A;
-        C(Guest 2) -->|asks for a plate| A;
-    end
-
-    subgraph "Results"
-        D["Plate #1 (hashCode: 123)"]
-        E["Plate #2 (hashCode: 456)"]
-    end
-
-    A --> D;
-    A --> E;
-
-    style A fill:#ccf,stroke:#333,stroke-width:2px
-    style D fill:#f9f,stroke:#333,stroke-width:2px
-    style E fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#333,stroke:#8f8,color:#fff
+    style C fill:#552,stroke:#ff8,color:#fff
+    style D fill:#255,stroke:#8ff,color:#fff
 ```
 
-### The Most Important Point: The Lifecycle Trap! ⚠️
-Mawa, idi chala important, interview lo kuda adagachu. Jagrattha!
+### The Lifecycle Trap: "I Don't Know You Anymore" ⚠️
+Mawa, idi chala important, interview lo pakka adugutaru. Jagrattha!
 
-Spring, singleton beans ni puttina daggara nunchi chachipoyye varaku chuskuntundi (`@PostConstruct` to `@PreDestroy`).
+Spring, singleton beans ni puttina daggara nunchi chachipoyye varaku chuskuntundi (`@PostConstruct` to `@PreDestroy`). Kani, prototype beans vishayam lo, Spring oka **irresponsible parent**.
 
-Kani, prototype beans vishayam lo, Spring oka **responsible parent kadu**.
-1.  Adi prototype bean ni **create chestundi**.
-2.  Dependencies ni **inject chestundi**.
-3.  Daanini neeku **ichestundi**.
-4.  **And then... it forgets about it!** 🤷‍♂️
+It does this:
+1.  **Creates** the bean object.
+2.  **Configures** it (injects dependencies).
+3.  Calls `@PostConstruct` callbacks.
+4.  **Hands the bean to you.**
+5.  ...and then completely **forgets about it**. It no longer holds a reference to that bean.
 
-Spring container ki, aa tarvata aa bean instance ekkada undi, em chestundi anedi teliyadu. Anduke, prototype beans ki **destruction lifecycle callbacks (`@PreDestroy` lantiవి) call avvavu**.
+Because the container forgets about the bean, it **cannot call the `@PreDestroy` method**.
+
+**Diagram: The Lifecycle Difference**
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
+sequenceDiagram
+    participant C as Your Code
+    participant S as Spring Container
+    participant B as Prototype Bean
+
+    C->>+S: context.getBean()
+    S->>+B: new PrototypeBean()
+    S->>B: @Autowired dependencies
+    S->>B: @PostConstruct init()
+    S-->>-C: returns the bean
+
+    Note over S,B: Spring's job is DONE.<br/>It has no reference to the bean anymore.
+
+    C->>B: You use the bean...
+
+    Note over C: You are now responsible<br/>for cleaning up any resources.
+
+    C--xB: (Bean becomes eligible for Garbage Collection)
+
+    Note right of B: @PreDestroy is NEVER called by Spring!
+```
 
 > **The Rule:** If your prototype bean holds expensive resources (like a database connection or a file handle), **you**, the client code, are responsible for cleaning it up. Spring will not do it for you.
 

@@ -23,65 +23,52 @@ Ee question ki answer, "Assembly Line" lo chuddam.
 *   **You (The Programmer):** Nuvvu `MySingletonController.java` ane blueprint design chesav. You also created the `RequestScopeBean.java` blueprint and marked it with `@RequestScope(proxyMode = ...)`. Your job is done.
 *   **Spring (The Factory Foreman):** Application start ayye time lo, the Foreman (Spring) starts the assembly line.
 
-**The Startup Story (Assembly Line) Diagram**
+**The Full Story: From Startup to Multiple Requests**
+
+This diagram shows the complete lifecycle.
 ```mermaid
 %%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
 sequenceDiagram
     participant Spring as Spring Container 🏭
-    participant Proxy as Proxy for RequestScopeBean ✨
     participant Controller as MySingletonController 🤖
+    participant Proxy as Injected Proxy ✨
+    participant BeanA as Real Bean A
+    participant BeanB as Real Bean B
 
-    Spring->>Spring: 1. Read all blueprints (.java files)
-    Spring->>+Proxy: 2. Sees `@RequestScope(proxyMode=...)`.<br>Creates the Proxy object first (Just Once!)
-    Proxy-->>-Spring: Proxy is ready!
+    box "Application Startup"
+        Spring->>Controller: new MySingletonController()
+        Spring->>Proxy: new RequestScopeBean_Proxy()
+        Spring->>Controller: Injects Proxy into Controller
+    end
 
-    Spring->>+Controller: 3. Now, creates the Singleton Controller (Just Once!)
-    Controller-->>Spring: Controller object is ready!
+    box "User 1's Request"
+        Controller->>Proxy: getUserAgent()
+        Proxy->>Spring: Get me the bean for this request.
+        Spring->>BeanA: new RequestScopeBean()
+        Proxy->>BeanA: getUserAgent()
+        BeanA-->>Proxy: "User-Agent: curl"
+        Proxy-->>Controller: "User-Agent: curl"
+    end
 
-    Spring->>Controller: 4. Injects the PROXY ✨ into the Controller
-    Note right of Controller: The Controller now holds a<br>reference to the Proxy forever.
+    box "User 2's Request"
+        Controller->>Proxy: getUserAgent()
+        Proxy->>Spring: Get me the bean for this request.
+        Spring->>BeanB: new RequestScopeBean()
+        Proxy->>BeanB: getUserAgent()
+        BeanB-->>Proxy: "User-Agent: Chrome"
+        Proxy-->>Controller: "User-Agent: Chrome"
+    end
 ```
-**Conclusion:** **Spring creates the proxy, not your controller.** And it only creates it **one time** at the very beginning.
+**Conclusion:** The **Controller** and the **Proxy** are created only once at startup. A **new Real Bean** is created for each and every HTTP request.
 
 ---
-### Doubt 2: What is a Request-Scoped Bean For?
+### What is a Request-Scoped Bean For?
 
 So, why do we even need this? What's its purpose?
 
 Think of the `RequestScopeBean` as a **clean, request-specific data carrier 📦**. Its main job is to hold information related to a *single* HTTP request, keeping it separate from other requests.
 
 The most powerful use is to **pull data *from* the `HttpServletRequest` and store it in a clean, object-oriented way.** Our example does exactly this: it injects the `HttpServletRequest` and pulls the `User-Agent` header from it.
-
-**The Flow of Data and Dependencies**
-```mermaid
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
-graph TD
-    subgraph "Incoming HTTP Request"
-        direction LR
-        Req[("HttpRequest<br/>Header: User-Agent='curl/7.68'")]
-    end
-
-    subgraph "Spring's Magic for this Request"
-        direction TB
-        subgraph "Step 1: Create Real Bean"
-            RealBean["Real RequestScopeBean<br/>(Created for this request ONLY)"];
-            Req -- "Spring injects the request<br/>into the bean's constructor" --> RealBean;
-            RealBean -- "Pulls 'curl/7.68' from header<br/>and stores it" --> Data["Stored Data:<br/>userAgent = 'curl/7.68'"];
-        end
-
-        subgraph "Step 2: The Service Layer"
-            Service["MySingletonController (Singleton)"];
-            Proxy["Proxy to<br/>RequestScopeBean ✨"];
-            Service -- "holds a reference to" --> Proxy;
-            Proxy -.->|delegates call to| RealBean;
-        end
-    end
-
-    style Req fill:#234,stroke:#fff
-    style RealBean fill:#552,stroke:#ff8,color:#fff
-    style Service fill:#333,stroke:#8f8,color:#fff
-    style Proxy fill:#525,stroke:#f8f,color:#fff
-```
 
 **The Benefit:** Our `MySingletonController` doesn't need to know about the messy `HttpServletRequest`. It only knows about the clean `RequestScopeBean` object, which makes our code much cleaner and easier to test.
 
