@@ -61,3 +61,18 @@ graph TD
 Ee diagram lo chudu, `Controller` and `Service` ki `TrackingIdBean` tho sambandam eh ledu. Kevalam `Downstream Client` ki matrame adi kavali, so adi matrame daanini adugutundi. This is clean, decoupled architecture!
 
 Let's see the code for this in the `io.mawa.spring.realworld` package.
+
+---
+### Final Doubts Answered
+
+**Q1: Does Spring create a request bean automatically?**
+**A:** No. Spring creates **nothing** automatically. We must provide the blueprint (`.java` class) with the `@RequestScope` annotation. If we don't provide the blueprint, no request-scoped bean will ever exist.
+
+**Q2: How does the HTTP request flow to the proxy?**
+**A:** It doesn't. The flow is: `Request -> Controller -> Proxy -> Real Bean`. The request hits the controller first. The proxy is only used when the controller's code tries to access the request-scoped dependency.
+
+**Q3: Is this used in the real world?**
+**A:** Yes, all the time. It's a very common pattern for passing request-level information like Tracking IDs, User IDs, or Tenant IDs through an application without polluting method signatures.
+
+**Q4: How can we see the beans and their scopes?**
+**A:** We can ask the `ApplicationContext`! The code added to our `WebApp.java` now iterates through all bean definitions at startup and prints their registered scope, giving us proof of what Spring is managing.
