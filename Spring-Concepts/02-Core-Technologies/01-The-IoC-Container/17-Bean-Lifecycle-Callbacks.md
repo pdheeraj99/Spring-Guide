@@ -36,7 +36,8 @@ sequenceDiagram
         participant Client as Your App Code
         Client->>Bean: Use the bean's methods
     end
-    Container->>-Bean: 4. @PreDestroy Method
+    Container->>Bean: 4. @PreDestroy Method
+    deactivate Bean
     Note right of Bean: Bean is about to be destroyed. Clean up now! 🧹
 ```
 
