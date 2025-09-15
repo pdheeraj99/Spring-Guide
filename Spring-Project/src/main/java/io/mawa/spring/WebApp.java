@@ -1,8 +1,10 @@
 package io.mawa.spring;
 
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import java.util.Arrays;
 
@@ -16,11 +18,20 @@ public class WebApp {
     public static void main(String[] args) {
         ApplicationContext context = SpringApplication.run(WebApp.class, args);
 
-        System.out.println("\n--- Printing all bean names in the Application Context ---");
+        System.out.println("\n--- Inspecting all bean definitions and their scopes ---");
         String[] beanNames = context.getBeanDefinitionNames();
         Arrays.sort(beanNames);
         for (String beanName : beanNames) {
-            System.out.println(beanName);
+            // Get the BeanDefinition once by casting the context
+            BeanDefinition beanDefinition = ((ConfigurableApplicationContext) context).getBeanFactory().getBeanDefinition(beanName);
+
+            String scope = beanDefinition.getScope();
+            String beanClassName = beanDefinition.getBeanClassName();
+
+            // We only print our own beans for clarity, not all of Spring's internal beans.
+            if (beanClassName != null && beanClassName.startsWith("io.mawa.spring")) {
+                 System.out.println("Bean Name: " + beanName + "  |  Scope: " + (scope.isEmpty() ? "singleton" : scope));
+            }
         }
         System.out.println("------------------------------------------------------\n");
     }
