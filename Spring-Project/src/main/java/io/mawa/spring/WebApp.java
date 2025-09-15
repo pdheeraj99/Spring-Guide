@@ -2,10 +2,10 @@ package io.mawa.spring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import java.util.Arrays;
 
-// We explicitly scan only the packages we need for the web examples
-// to avoid conflicts with older, standalone examples.
 @SpringBootApplication
 @ComponentScan(basePackages = {
     "io.mawa.spring.core.scopes.request"
@@ -13,7 +13,15 @@ import org.springframework.context.annotation.ComponentScan;
 public class WebApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(WebApp.class, args);
+        ApplicationContext context = SpringApplication.run(WebApp.class, args);
+
+        System.out.println("\n--- Printing all bean names in the Application Context ---");
+        String[] beanNames = context.getBeanDefinitionNames();
+        Arrays.sort(beanNames);
+        for (String beanName : beanNames) {
+            System.out.println(beanName);
+        }
+        System.out.println("------------------------------------------------------\n");
     }
 
 }

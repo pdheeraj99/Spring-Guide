@@ -9,9 +9,9 @@ Mawa, manam ippudu web world loki enter avutunnam! Ee web scopes lo first and mo
 ### The Core Puzzle: Singleton Controller meets Request-Scoped Bean 🤔
 
 Let's get straight to the point that causes confusion.
-*   **Fact 1:** Mana `@RestController` anedi **Singleton**. Application start ayinappudu **oke okka sari** create avutundi.
+*   **Fact 1:** Mana `@RestController` (e.g., `MySingletonController`) anedi **Singleton**. Application start ayinappudu **oke okka sari** create avutundi.
 *   **Fact 2:** Mana `@RequestScope` bean anedi **prati kotha HTTP request ki** create avvali.
-*   **The Puzzle:** Controller create ayye time ki, asalu `RequestScopeBean` anedi ledhu! Mari Spring, `MyController` lo unna `private final RequestScopeBean myBean;` lanti field ni ela fill chestundi?
+*   **The Puzzle:** Controller create ayye time ki, asalu `RequestScopeBean` anedi ledhu! Mari Spring, `MySingletonController` lo unna `private final RequestScopeBean myBean;` lanti field ni ela fill chestundi?
 
 The answer is a powerful, behind-the-scenes trick: **The Scoped Proxy**.
 
@@ -20,7 +20,7 @@ The answer is a powerful, behind-the-scenes trick: **The Scoped Proxy**.
 
 Ee question ki answer, "Assembly Line" lo chuddam.
 
-*   **You (The Programmer):** Nuvvu `RequestScopeController.java` ane blueprint design chesav. You also created the `RequestScopeBean.java` blueprint and marked it with `@RequestScope(proxyMode = ...)`. Your job is done.
+*   **You (The Programmer):** Nuvvu `MySingletonController.java` ane blueprint design chesav. You also created the `RequestScopeBean.java` blueprint and marked it with `@RequestScope(proxyMode = ...)`. Your job is done.
 *   **Spring (The Factory Foreman):** Application start ayye time lo, the Foreman (Spring) starts the assembly line.
 
 **The Startup Story (Assembly Line) Diagram**
@@ -29,7 +29,7 @@ Ee question ki answer, "Assembly Line" lo chuddam.
 sequenceDiagram
     participant Spring as Spring Container 🏭
     participant Proxy as Proxy for RequestScopeBean ✨
-    participant Controller as Singleton Controller 🤖
+    participant Controller as MySingletonController 🤖
 
     Spring->>Spring: 1. Read all blueprints (.java files)
     Spring->>+Proxy: 2. Sees `@RequestScope(proxyMode=...)`.<br>Creates the Proxy object first (Just Once!)
@@ -70,7 +70,7 @@ graph TD
         end
 
         subgraph "Step 2: The Service Layer"
-            Service["RequestScopeController (Singleton)"];
+            Service["MySingletonController (Singleton)"];
             Proxy["Proxy to<br/>RequestScopeBean ✨"];
             Service -- "holds a reference to" --> Proxy;
             Proxy -.->|delegates call to| RealBean;
@@ -83,19 +83,19 @@ graph TD
     style Proxy fill:#525,stroke:#f8f,color:#fff
 ```
 
-**The Benefit:** Our Controller doesn't need to know about the messy `HttpServletRequest`. It only knows about the clean `RequestScopeBean` object, which makes our code much cleaner and easier to test.
+**The Benefit:** Our `MySingletonController` doesn't need to know about the messy `HttpServletRequest`. It only knows about the clean `RequestScopeBean` object, which makes our code much cleaner and easier to test.
 
 ---
 ### Code and How to Run
 
 Ee concepts ni live lo chudadaniki, manam create chesina code chudu:
-*   **`WebApp.java`**: The main application entry point.
+*   **`WebApp.java`**: The main application entry point that now prints all bean names.
 *   **`RequestScopeBean.java`**: Our request-scoped bean that now holds the User-Agent.
-*   **`RequestScopeController.java`**: The controller that now returns the User-Agent.
+*   **`MySingletonController.java`**: The controller (renamed for clarity!) that uses the bean.
 
 **How to Run:**
 1.  `cd Spring-Project`
 2.  `mvn spring-boot:run`
 3.  Open another terminal and run `curl http://localhost:8080/request-scope`. Check the server logs and the JSON response!
 
-I hope this new, more practical example and the updated diagrams make the concept crystal clear, mawa!
+I hope this new, detailed, evidence-based explanation makes the concept crystal clear, mawa! Let me know.

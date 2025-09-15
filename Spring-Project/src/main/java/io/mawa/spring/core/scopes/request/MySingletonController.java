@@ -8,14 +8,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-public class RequestScopeController {
+public class MySingletonController {
 
     private final RequestScopeBean requestScopeBean;
 
     @Autowired
-    public RequestScopeController(RequestScopeBean requestScopeBean) {
+    public MySingletonController(RequestScopeBean requestScopeBean) {
         this.requestScopeBean = requestScopeBean;
-        System.out.println("--- RequestScopeController CREATED (Singleton) ---");
+        System.out.println("--- MySingletonController CREATED (Singleton) ---");
         System.out.println("Controller injecting proxy for RequestScopeBean: " + requestScopeBean.getClass().getName());
     }
 
