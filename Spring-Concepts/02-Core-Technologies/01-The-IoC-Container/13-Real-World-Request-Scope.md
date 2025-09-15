@@ -63,6 +63,51 @@ Ee diagram lo chudu, `Controller` and `Service` ki `TrackingIdBean` tho sambanda
 Let's see the code for this in the `io.mawa.spring.realworld` package.
 
 ---
+### The Golden Rule of Proxies: When and Why?
+
+**The Rule:** Spring only creates a proxy when there is a **scope mismatch**.
+
+#### Scenario A: No Scope Mismatch (No Proxy Needed)
+Controller (Singleton) asks for a Service (Singleton). Their lifecycles match. Spring directly injects the **real** service object. No magic needed.
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
+graph TD
+    subgraph "Spring Container (Startup)"
+        C["Controller (Singleton)"];
+        S["BusinessService (Singleton)"];
+        C -- "injects REAL service" --> S;
+    end
+    style C fill:#333,stroke:#8f8,color:#fff
+    style S fill:#333,stroke:#8f8,color:#fff
+```
+
+#### Scenario B: Scope Mismatch (Proxy is the Solution!)
+Client (Singleton) asks for a TrackingIdBean (Request-Scoped). Their lifecycles do NOT match. This is a problem. Spring's solution is to inject a **Proxy**.
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2d2d2d', 'primaryTextColor': '#fff'}}}%%
+graph TD
+    subgraph "Spring Container (Startup)"
+        C["DownstreamClient (Singleton)"];
+        P["Proxy for TrackingIdBean ✨"];
+        C -- "injects PROXY, not the real bean" --> P;
+    end
+
+    subgraph "During a Request"
+        R["Real TrackingIdBean"];
+        P -.-> R;
+    end
+    style C fill:#333,stroke:#8f8,color:#fff
+    style P fill:#525,stroke:#f8f,color:#fff
+    style R fill:#552,stroke:#ff8,color:#fff,stroke-dasharray: 5 5
+```
+
+### Best Practice: When to use Request-Scoped Beans?
+
+For simple cases where only the controller needs a header, use `@RequestHeader` in the method. It's the easiest way.
+
+Use a `@RequestScope` bean when a piece of request-specific data (like a tracking ID) is needed by **multiple, different, deep components** in your application (`LoggingService`, `MetricsService`, `DownstreamClient`, etc.). It helps you avoid "parameter drilling" and keeps your code clean.
+
+---
 ### Final Doubts Answered
 
 **Q1: Does Spring create a request bean automatically?**
