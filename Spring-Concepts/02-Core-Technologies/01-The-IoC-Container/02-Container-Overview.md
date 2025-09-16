@@ -100,6 +100,72 @@ mvn compile exec:java -Dexec.mainClass="io.mawa.spring.core.container.ContainerD
 Hello from MyService! The container is working! 🎉
 ```
 
-Anthe mawa! We just created our first Spring application. Container start aindi, `MyService` bean ni find chesi create chesindi, and manam daanni adigithe ichesindi.
+---
+<br>
 
-From now on, we will build on top of this foundation. Next, let's dive deeper into what a "bean" really is. Ready? 💪
+### 🤔 Good to Know: The Bigger Picture!
+
+`Manam` ippudu `cheisina pani` (what we've just done) car engine ni manual ga start cheyadam nerchukunnattu. Nerchukovadaniki ide best way! Kani nijamaina car lo, manam key tipputham, anthe. 🔑 Aa "key" ne Spring Boot.
+
+Inkonni pro-level vishayalu chuddam.
+
+#### 1. The "Auto-Magic" Start in Web Apps 🌐
+
+Oka Spring Boot application lo (web API lantiది), manam eppudu ee line chudamu: `new AnnotationConfigApplicationContext(...)`.
+
+Mari adi ela pani chestundi?
+*   Manam main `SpringApplication.run(...)` method ni run chesinappudu, Spring Boot adi oka web application ani automatic ga detect chestundi.
+*   Adi automatic ga correct type of `ApplicationContext` ni create chestundi (e.g., `AnnotationConfigServletWebServerApplicationContext`).
+*   Web server (like Tomcat) ni start chesi, daanini ee context tho link chestundi.
+*   `Anthe!` Antha ade chuskuntundi. Kani 'under the hood' em jarugutundo telusukunte ne manam pro ayyedi!
+
+**Mermaid Diagram: The Spring Boot "Ignition Key"**
+```mermaid
+graph TD
+    A[Nuvvu `main()` method run chestav] -- Calls --> B{SpringApplication.run()};
+    B -- Creates --> C(ApplicationContext);
+    B -- Starts --> D[Embedded Tomcat Server];
+    C -- Manages all your --> E[@Component, @Service, etc.];
+    D -- Uses beans from --> C;
+```
+
+#### 2. Blast from the Past: The XML Era 📜
+
+Annotations intha famous kak mundu, antha XML files lo chesevaru. Ee style manaki paatha projects lo kanipinchachu. Deeni kosam `ClassPathXmlApplicationContext` ane container ni vadevaru.
+
+**Ela undedi ante:**
+`beans.xml` ane file lo ila undedi:
+```xml
+<beans>
+    <bean id="myCar" class="com.example.Car"/>
+    <bean id="myEngine" class="com.example.PetrolEngine"/>
+</beans>
+```
+And ila load chesevaru:
+```java
+// The old way!
+ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+```
+Idi undi ani telusukunte chalu! Framework gurinchi neeku unna knowledge depth ni chupistundi.
+
+#### 3. Composing Configurations with `@Import` 🧩
+
+Okavela nee configuration antha multiple `@Configuration` classes lo unte? Vaatini kalapadaniki `@Import` vadachu. Idi Lego blocks ni kalipi pedda structure build chesinattu.
+
+```java
+@Configuration
+@ComponentScan("com.example.vehicles")
+public class CarConfig { ... }
+
+@Configuration
+public class EngineConfig { ... }
+
+@Configuration
+@Import({CarConfig.class, EngineConfig.class}) // <-- The magic glue!
+public class AppConfig {
+    // Ippudu ee okka config ki cars and engines gurinchi telusu!
+}
+```
+
+**Cliffhanger:**
+Beans ni scan cheyadam, container ni run cheyadam chusam. Kani asalu ee "bean" ante enti? Daani jeevitha chakram (lifecycle) enti? Adi ela puttindi, ela chanipotundi? Next chapter lo manam bean biologists ga marudam! 🔬

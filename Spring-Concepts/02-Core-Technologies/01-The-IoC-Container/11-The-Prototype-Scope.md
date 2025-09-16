@@ -85,6 +85,45 @@ Ee "prati sari kotha piece" concept ni prove cheyadaniki, `Spring-Project` lo `i
 2.  **`PrototypeScopeConfig.java`:** Ee bean ni define chese configuration class.
 3.  **`PrototypeScopeDemoApp.java`:** Mana main app. Ikkada manam container nunchi bean ni **rendu sarlu** adigi, vaati hash codes veru veru ga unnayo ledo chustam.
 
-Ee code manam next step lo create cheddam. Appudu ee concept live lo chudochu!
+---
+<br>
 
-That's it for the prototype scope! A simple concept with one very important lifecycle rule. Ippudu manam deeniki code rasi, inka clear ga ardam cheskundam. Ready aa? 🔥
+### 🛠️ Pro-Tip: So... How CAN we clean up Prototypes?
+
+Mana prototype bean ni manaki icchesaka, Spring daanini vadhilestundi ani manaki telusu. Adi, "Ninnu ee lokaniki tecchanu, kani ika nee brathuku nuvve bratakali!" ani cheppe parent lantiది.
+
+Sare, okavela mana prototype bean oka file no leda database connection no open cheste, adi close ayyela chudadam ela?
+
+Idi konchem complex ayina, 'pro' solution entante, oka custom `BeanPostProcessor` ni create cheyadam.
+
+**The High-Level Idea (The "Chaperone" Pattern):**
+1.  Nuvvu oka special `BeanPostProcessor` raastav, adi nee specific prototype beans create ayinappudu chustu untundi.
+2.  Adi oka prototype bean ni chusinappudu, neeku direct ga aa bean ni ivvadu. Daaniki badulu, aa bean kosam oka "wrapper" or "chaperone" ni create chestundi.
+3.  Aa chaperone ni neeku istundi. Nuvvu aa chaperone dwara real bean ni vadutav.
+4.  Ee prototype ni create chesina `ApplicationContext`, adi icchina chaperones anni reference pettukuntundi.
+5.  Application shutdown ayyetappudu, aa context, aa chaperones list antha chusi, prathi okkariki, "Sare, nuvvu chuskuntunna bean ni clean up chese time vachindi" ani cheptundi.
+
+**Idi easy na?** Kadu! Idi oka advanced technique. 99% of the time, prototype beans ni simple ga, expensive resources lekunda design cheyali.
+
+Kani ee paniki `BeanPostProcessor` vadali ani neeku telusu ani interviewer ki chepthe, adi nee deep problem-solving skills ni chupistundi.
+
+**Mermaid Diagram: The Chaperone**
+```mermaid
+graph TD
+    A(Nuvvu Prototype Bean adugutav);
+    B(BeanPostProcessor) -- Intercept chestundi --> A;
+    B -- Creates --> C(Real Prototype Bean);
+    B -- Creates --> W(Chaperone/Wrapper);
+    W -- Wraps --> C;
+    B -- Neeku istundi --> W;
+
+    subgraph Shutdown Appudu
+        D(ApplicationContext) -- Cheptundi --> W(Chaperone/Wrapper);
+        W -- destroy() call chestundi --> C;
+    end
+```
+
+**The Main Takeaway:** Prototype beans lo cleanup logic pettadam avoid cheyali. Okavela tappakapothe, custom `BeanPostProcessor` anedi daari, kani adi experts ki matrame.
+
+**Cliffhanger:**
+Standalone applications kosam scopes (`singleton`, `prototype`) cover chesam. Kani web anedi veru `beast`! Okavela neeku oka single HTTP request varaku matrame brathike object kavali anukunte? Leda, oka user yokka entire session varaku unde object, shopping cart lantiది kavali anukunte? Ive web scopes, and veetiki oka magical proxy sidekick untundi! Next, `request` scope gurinchi chuddam!

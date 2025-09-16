@@ -89,4 +89,56 @@ Chusava! `EventLogger` (Step 1) anedi *eppudu* `SystemInitializer` (Step 2) kann
 
 **Bonus Point:** `depends-on` anedi shutdown order ni kuda control chestundi, but in reverse! Ante, `SystemInitializer` mundu destroy ayyi, aa tarvata `EventLogger` destroy avutundi.
 
-That's it for this short but powerful concept! Ready for the next one? 💪
+---
+<br>
+
+### 🚀 Pro-Tip: Depending on Multiple Beans!
+
+Okavela mana `CoffeeMachine` ki okati kanna ekkuva hidden dependencies unte? Udaharanaki, daaniki `WaterHeater` on lo undali and `BeanGrinder` kuda ready ga undali anukundam.
+
+`Chala easy`! Manam `@DependsOn` annotation ki oka array of bean names pass cheyochu.
+
+```java
+@Component("coffeeMachine")
+// Ippudu, ee bean anedi waterHeater AND beanGrinder rendu ready ayyake create avutundi!
+@DependsOn({"waterHeater", "beanGrinder"})
+public class CoffeeMachine {
+    public CoffeeMachine() {
+        System.out.println("✅ Coffee Machine is ready. Let's brew!");
+    }
+}
+
+@Component("waterHeater")
+public class WaterHeater {
+    public WaterHeater() {
+        System.out.println("💧 Water Heater is on.");
+    }
+}
+
+@Component("beanGrinder")
+public class BeanGrinder {
+    public BeanGrinder() {
+        System.out.println("🫘 Bean Grinder is ready.");
+    }
+}
+```
+
+**Expected Output:**
+Output lo eppudu `WaterHeater` and `BeanGrinder` messages `CoffeeMachine` kanna mundhe vastayi. Spring adi guarantee chestundi!
+
+```
+💧 Water Heater is on.
+🫘 Bean Grinder is ready.
+✅ Coffee Machine is ready. Let's brew!
+```
+
+**Mermaid Diagram: The Chain of Command**
+```mermaid
+graph TD
+    A(BeanGrinder) --> C(CoffeeMachine);
+    B(WaterHeater) --> C;
+    C -- A & B ayye varaku start avvadu --> D((Ready to Brew!));
+```
+
+**Cliffhanger:**
+Beans ni EAGER ga, correct order lo ela create cheyalo chusam. Kani okavela oka bean manaki ventane avasaram lekapothe? Adi chala "heavy" ga undi, create avvadaniki chala time and memory tesukuntunte? Mana application startup ni, manam బహుశా vadani bean kosam slow cheyadam enduku. Spring ki, "Ee bean ni nenu adige varaku create cheyaku" ani cheppe option unda? Oh yes, undi! Daanine Lazy Initialization antaru... adi next chuddam!

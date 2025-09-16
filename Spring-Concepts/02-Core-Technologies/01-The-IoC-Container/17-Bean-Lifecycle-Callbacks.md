@@ -65,4 +65,85 @@ Ee lifecycle ni live lo chudadaniki, manam `io.mawa.spring.core.lifecycle` ane k
 2.  **`LifecycleConfig.java`:** A simple configuration class to define our bean.
 3.  **`LifecycleDemoApp.java`:** The main app. Ikkada manam container ni start chesi, use chesi, and importantly, **close** cheddam. Container ni close cheste tappa `@PreDestroy` call avvadu!
 
-Ee code antha manam next step lo create cheddam! Ready aa? 🎬🔥
+---
+<br>
+
+### 🛠️ The Third Way: `initMethod` and `destroyMethod`
+
+Okavela nuvvu oka third-party library nunchi bean ni create chestunte? Nuvvu daani source code loki velli `@PostConstruct` add cheyalevu kada. Mari appudu Spring ki, create ayyaka ఏ method call cheyalo ela cheptav?
+
+Appude manam `@Bean` annotation yokka `initMethod` and `destroyMethod` attributes ni vadatam!
+
+Idi nuvvu kotha ga konna electronic gadget lantiది. Nuvvu daani internal circuits ni marchalevu, kani instruction manual lo, "Start cheyadaniki green button nokku, aapeyadaniki red button nokku" ani untundi. Aa `initMethod` anedi aa green button anamata.
+
+**The Code:**
+```java
+// Idi oka library nunchi vachina class. Ee code ni manam marchalemu.
+public class DatabaseConnectionPool {
+    public void connect() { // Idi వాళ్ళ "init" method
+        System.out.println("Connecting to database...");
+    }
+    public void shutdown() { // Idi వాళ్ళ "destroy" method
+        System.out.println("Closing all connections.");
+    }
+}
+
+@Configuration
+public class AppConfig {
+
+    @Bean(initMethod = "connect", destroyMethod = "shutdown")
+    public DatabaseConnectionPool connectionPool() {
+        return new DatabaseConnectionPool();
+    }
+}
+```
+Ippudu Spring ki telusu, `DatabaseConnectionPool` bean create ayyaka `.connect()` call cheyali ani, and application close ayye mundu `.shutdown()` call cheyali ani. `Chala simple!`
+
+### 🥊 Lifecycle Showdown: The EXACT Execution Order!
+
+Idi oka classic deep-dive interview prashna. Okavela oka vedhava developer (mischievous developer) ee moodu (`three`) rakalu okka bean meeda vadithe?
+```java
+@Bean(initMethod = "customInit")
+public class MegaBean implements InitializingBean {
+    @PostConstruct
+    public void postConstruct() { ... }
+
+    @Override
+    public void afterPropertiesSet() { ... }
+
+    public void customInit() { ... }
+}
+```
+Dhenilo edi mundu run avutundi? Ee order fix ayyi untundi and telusukovadam chala mukhyam.
+
+**Initialization Order (The "AIM" Rule: Annotation, Interface, Method):**
+1.  **A**nnotation: `@PostConstruct` method **EPPUDU FIRST** vastundi.
+2.  **I**nterface: `InitializingBean` yokka `afterPropertiesSet()` method **SECOND** vastundi.
+3.  **M**ethod: `@Bean` definition lo unna custom `initMethod` **LAST** lo vastundi.
+
+**Destruction Order (Ide AIM rule!):**
+1.  **A**nnotation: `@PreDestroy` method **EPPUDU FIRST** vastundi.
+2.  **I**nterface: `DisposableBean` yokka `destroy()` method **SECOND** vastundi.
+3.  **M**ethod: `@Bean` definition lo unna custom `destroyMethod` **LAST** lo vastundi.
+
+**Mermaid Diagram: The Lifecycle Race**
+```mermaid
+graph TD
+    subgraph Initialization
+        direction LR
+        A["@PostConstruct"] --> B["InitializingBean.afterPropertiesSet()"];
+        B --> C["@Bean(initMethod=...)"];
+        C --> D((Bean Ready ga undi!));
+    end
+    subgraph Destruction
+        direction LR
+        E["@PreDestroy"] --> F["DisposableBean.destroy()"];
+        F --> G["@Bean(destroyMethod=...)"];
+        G --> H((Bean Destroyed!));
+    end
+```
+
+Ee order gurtupettukunte, neeku Spring container meeda chala deep understanding undani chupistundi.
+
+**Cliffhanger:**
+Oka bean tana lifecycle ni ela manage cheskuntundo chusam. Kani okavela oka bean ki tana chuttu unna prapancham gurinchi telusukovali anukunte? Adi unde `ApplicationContext` reference kavali anukunte? Leda container lo daaniki icchina peru telusukovali anukunte? Daanikosam, oka bean special `Aware` interfaces ni implement chesi, "self-aware" ga marutundi. Next, mana beans ni self-aware cheddam!

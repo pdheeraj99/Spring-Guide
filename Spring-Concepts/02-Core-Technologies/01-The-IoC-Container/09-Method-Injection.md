@@ -111,5 +111,68 @@ Executing command created at: 2025-09-14T03:43:12.123660 (hashCode: 67890)
 
 Notice the different hashCodes and creation times for the PrototypeCommand!
 ```
+---
+<br>
 
-That's Method Injection! Oka tricky problem ki chala clean solution. With this, we have finished the "Dependencies" section. Next, we will *officially* enter the world of **Bean Scopes**! Ready aa? 🔥
+### 🦸 The Alternative Hero: The `Provider` Pattern
+
+`@Lookup` anedi Spring yokka magic trick. Kani manaki inka standard ga unde, mariyu mana class ni `abstract` cheyani solution kavali anukunte? Appude scene loki vastadu mana `Provider` interface!
+
+A `Provider<T>` anedi simple interface, daanilo `T get()` ane oke oka method untundi. Nuvvu `Provider<MyPrototypeBean>` ni inject cheste, Spring neeku prathi sari `get()` call chesinapudalla, oka kotha `MyPrototypeBean` instance ni istundani guarantee istundi.
+
+Mana Vending Machine problem ni malli solve cheddam, ee sari `Provider` tho.
+
+**The Code (No `abstract` needed!):**
+```java
+import javax.inject.Provider; // From the standard JSR-330 library
+
+@Component // Idi oka normal, concrete class!
+public class VendingMachine {
+
+    private final Provider<Snack> snackProvider;
+
+    // Manam snack ni kadu, snack yokka PROVIDER ni inject chestunnam!
+    @Autowired
+    public VendingMachine(Provider<Snack> snackProvider) {
+        this.snackProvider = snackProvider;
+    }
+
+    public Snack dispenseSnack() {
+        // Ee method call ayinapudalla, .get() oka KOTHA snack ni create chestundi!
+        return snackProvider.get();
+    }
+}
+```
+`Chudandi?` `@Lookup` ledu, `abstract` class ledu. Chala mandi developers ki, idi inka clean ga and explicit ga anipistundi.
+
+#### 🥊 Showdown: `@Lookup` vs. `Provider`
+
+Sare, ee renditlo edi vadali? Rendu goppave! Adi nee style batti untundi. Veetini head-to-head compare cheddam.
+
+| Feature | `@Lookup` Method | `Provider` Injection |
+| :--- | :--- | :--- |
+| **Class Type** | `abstract` or interface undali | Normal, concrete class undochu |
+| **Dependency** | Pure Spring Framework (`@Lookup`) | Standard JSR-330 (`javax.inject.Provider`) |
+| **Usage** | `abstract` method ni call cheyali: `dispenseSnack()` | Provider meeda `.get()` call cheyali: `snackProvider.get()` |
+| **"Magic" Level**| High ✨ (Spring eh subclass ni generate chestundi) | Low 🪄 (Inka explicit ga, clear ga untundi) |
+| **Analogy** | Oka magic vending machine | Snack storeroom ki key unna vyakti |
+
+**The Bottom Line:**
+*   Spring magic cheyadam, and factory lanti nature ni dachipettadam neeku istam aite `@Lookup` vadu.
+*   Neeku inka explicit, standard, and takkuva "magic" unna approach kavali anukunte `Provider` vadu.
+
+Ee rendu patterns telisinte, nuvvu DI lo oka true master vi!
+
+**Mermaid Diagram: The Two Paths**
+```mermaid
+graph TD
+    A(Singleton Bean) -- kotha ga kavali --> B(Prototype Bean);
+    A -- Daari 1: @Lookup --> C{Abstract Method};
+    C -- Spring implementation generate chestundi --> D(Kotha Prototype);
+
+    A -- Daari 2: Provider --> E{Inject Provider<Proto>};
+    E -- Nuvvu .get() call chestav --> F(Kotha Prototype);
+```
+
+**Cliffhanger:**
+"Singleton" and "prototype" gurinchi chala matladukunnam. Ee perlu ni "scopes" antaru. Kani asalu "singleton" ante enti? Okate object aa? Avunu, kani daani valla vache *pramadam* (danger) enti? Chala mandi users oke sari aa okka object ni vadithe emavutundi? Andulo andari kante famous scope, and daani pedda trap gurinchi matladukundam... Singleton scope, next episode lo.

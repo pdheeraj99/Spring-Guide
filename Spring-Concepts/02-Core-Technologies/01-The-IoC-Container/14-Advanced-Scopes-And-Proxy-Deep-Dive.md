@@ -102,5 +102,65 @@ graph TD
     style C fill:#333,stroke:#8f8
     style P fill:#525,stroke:#f8f
 ```
+---
+<br>
 
-Mawa, this is the complete picture. You have now understood this topic at a very deep level. Congratulations! 🚀
+### 🧙‍♂️ The Magic Behind the Curtain
+
+Scoped proxy anedi oka adbhutamaina trick, kani daaniki oka friend sahayam kavali. Singleton lo unde aa proxy ki, ippudu active ga unna HTTP request edho ela telustundi?
+
+Oka pedda hotel (mana application) lo, chala mandi guests (requests) unnaru anukondi. Front desk (proxy) ki, వాళ్ళ mundu nilabadda person ki, ఏ room key (request-scoped bean) ivvalo ela telustundi? Evaro okaru door daggara ID check chestu undali!
+
+#### 1. The ID Checker: `RequestContextListener`
+
+Standard Java web application lo, ee "ID checker" ye `ServletRequestListener`. Spring manaki `RequestContextListener` ane oka specific listener ni istundi.
+
+**Idi em chestundi:**
+*   Oka kotha HTTP request ragane, ee listener `HttpServletRequest` object ni pattukuntundi.
+*   Adi oka `ThreadLocal` variable use chesi, aa request object ni, aa request ni handle chestunna current thread ki "attach" chestundi.
+*   Request aipogane, ee listener antha clean up chesi, request object ni thread nunchi detach chestundi.
+
+Ide **critical link**! Scoped proxy, current `ThreadLocal` lo chusi, current request ni kanukkuntundi. Daanini batti, aa request tho associate ayina request-scoped bean ni kanukkuntundi.
+
+**The Spring Boot Bonus:** Spring Boot, manam oka web application build chestunnam ani detect cheste, ee `RequestContextListener` ni automatic ga configure chesi, register chestundi. Manaki antha free ga vastundi! Okavela manam paatha, non-Boot application vadutunte, deenini maname `web.xml` file lo register cheyali.
+
+#### 2. Choosing Your Proxy Superpower: `proxyMode`
+
+`@Scope` annotation ki oka secret power-up undi: `proxyMode` attribute. Ee `proxyMode` attribute, Spring eh rakamaina proxy ni create cheyalo manalni choose cheyyanistundi.
+
+```java
+@Bean
+@Scope(value = "request", proxyMode = ScopedProxyMode.TARGET_CLASS)
+public UserContext userContext() {
+    return new UserContext();
+}
+```
+
+Rendu main rakalu untayi:
+*   **`ScopedProxyMode.TARGET_CLASS` (The Default):**
+    *   **Ela:** CGLIB ane library use chesi, runtime lo nee bean class ki oka kotha *subclass* ni create chestundi. E.g., `UserContext$$EnhancerBySpringCGLIB`.
+    *   **Pro:** Idi just pani chestundi, nee bean ye interface ni implement cheyakapoina.
+    *   **Con:** Idi oka `final` class ki proxy create cheyaledu (endukante final class ni subclass cheyalem).
+
+*   **`ScopedProxyMode.INTERFACES` (The Diplomat):**
+    *   **Ela:** Standard Java JDK Dynamic Proxies ni vadutundi. Idi nee bean implement chesina *interface* ni implement chese proxy ni create chestundi.
+    *   **Pro:** Idi oka standard Java feature.
+    *   **Con:** Deeniki nee bean **tappakunda** okka interface ayina implement cheyali. Nee bean just oka concrete class aite, ee mode fail avutundi.
+
+**The Rule of Thumb:** Default (`TARGET_CLASS`) ne vadandi, neeku specific karanam unte tappa (like `final` classes tho pani cheyadam or interface-based proxies ante neeku chala istam aite).
+
+**Mermaid Diagram: The Full Machinery**
+```mermaid
+graph TD
+    A(HTTP Request In) --> B{RequestContextListener};
+    B -- Request ni attach chestundi --> C(ThreadLocal);
+
+    D(Singleton Service) -- Kaligi undi --> E(Scoped Proxy);
+    E -- Adugutundi --> C;
+    C -- "Idi current request" ani cheptundi --> E;
+    E -- Finds/creates --> F(Real Request-Scoped Bean);
+    D -- Interact avutundi --> F;
+```
+
+**Cliffhanger:**
+`request` scope anedi oka single API call varaku unde data ki perfect. Kani oke user nunchi vache multiple requests varaku unde data gurinchi enti? Shopping cart lantiది. Nuvvu oka item add chesi, vere page ki click cheste, aa item akkade undali. Daanikosam, manaki inka long-lived scope kavali: the `session` scope. Next episode lo shopping ki veldam! 🛒

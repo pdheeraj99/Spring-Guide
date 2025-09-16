@@ -62,11 +62,76 @@ Ee interface lo rende rendu methods untayi:
 Chala simple. Manam raasina `BeanPostProcessor` class ni kuda oka normal bean laaga define cheste chalu. Spring container chala smart, adi `BeanPostProcessor` interface ni implement chese prathi bean ni automatic ga detect chesi, special ga treat chesi, munduga register cheskuntundi.
 
 ---
-### Code Reference: The Inspector in Action!
-Ee powerful concept ni live lo chudadaniki, manam `io.mawa.spring.core.bpp` ane kotha package create cheddam.
+<br>
 
-1.  **`MyBean.java`:** Oka simple bean, daaniki oka `init()` method undi.
-2.  **`MyBeanPostProcessor.java`:** Mana custom inspector. Idi `postProcessBefore/AfterInitialization` lo messages print chestundi.
-3.  **`BppDemoApplication.java`:** Mana Spring Boot application. Manam BPP ni and MyBean ni rendu `@Component` ga mark chestam. Spring Boot vaatini automatic ga scan chesi, register chestundi.
+### 🏛️ The Blueprint Architect: `BeanFactoryPostProcessor`
 
-Ee code antha manam next step lo create cheddam! Ready for the deep dive? 🚀
+QC Inspector (`BeanPostProcessor`) car ni check chese mundu, evaro okaru aa car blueprint ni design cheyali kada? Spring lo, ee panine `BeanFactoryPostProcessor` (BFPP) chestundi.
+
+Oka BFPP anedi oka special bean. Adi, container inka regular beans ni create cheyadam **mundare**, bean definitions (ante blueprints) ni chadavadaniki and **modify** cheyadaniki permission istundi.
+
+**Analogy:**
+*   **`BeanFactoryPostProcessor` (The Architect):** Car blueprint ni modify chestadu. "Car build cheyaka mundhe, deeni engine ni V6 nunchi V8 ki marchandi!"
+*   **`BeanPostProcessor` (The QC Inspector):** Poorthiga assemble ayina car ni inspect chestadu. "Car tayarayyindi. Ippudu deeniki rust-proofing spray kotti deliver cheddam."
+
+Andari kante famous BFPP `PropertySourcesPlaceholderConfigurer`. Ade mana `application.properties` file ni chadivi, mana bean definitions lo unna `${db.url}` lanti placeholders ni replace chestundi. Ante, adi blueprint ni marustondi!
+
+### 🥊 The Ultimate Showdown: BPP vs. BFPP
+
+Ee comparison table interviews ki chala upayogapadutundi.
+
+| Feature | `BeanPostProcessor` (BPP) | `BeanFactoryPostProcessor` (BFPP) |
+| :--- | :--- | :--- |
+| **Deeni meeda pani chestundi** | Asalu **bean instance** (the object) | **Bean definition** (the metadata/blueprint) |
+| **Eppudu run avutundi** | Prati bean instantiate ayyaka | Regular beans anni instantiate avvaka mundu |
+| **Analogy** | Quality Control Inspector | Blueprint Architect |
+| **Key Interface Method** | `postProcessBefore/AfterInitialization` | `postProcessBeanFactory` |
+| **Mukhyamaina Use Case** | Proxies create cheyadam (AOP), custom injections | Placeholders replace cheyadam, bean scopes marchadam |
+
+### 🚀 BPP Power-User Details
+
+Mana QC Inspectors gurinchi inko rendu pro details chuddam.
+
+#### 1. Controlling the Assembly Line: `@Order`
+
+Okavela neeku multiple `BeanPostProcessor`s unte? Edi mundu run avutundi? Udaharanaki, Spring yokka AOP BPP (`@EnableAspectJAutoProxy`) mana custom logging BPP kanna mundu run avvali.
+
+Deenini manam `Ordered` interface implement chesi or, inka easy ga, `@Order` annotation tho control cheyochu. **Takkuva number unnavi mundu run avutayi!**
+
+```java
+@Component
+@Order(1) // Mundu idi run avutundi
+public class SecurityBeanPostProcessor implements BeanPostProcessor { ... }
+
+@Component
+@Order(10) // Tarvata idi run avutundi
+public class LoggingBeanPostProcessor implements BeanPostProcessor { ... }
+```
+
+#### 2. The Inception Rule: The Processor Can't Process Itself!
+
+Idi chala aalochinchalsina, kani chala critical rule. `BeanPostProcessor`s anevi special beans. Avi container startup lo chala munduga create avutayi.
+
+Avi antha munduga create avvadam valla, avi **vere `BeanPostProcessor`s dwara process cheyabadavu**. Ante, nuvvu oka `BeanPostProcessor` meeda AOP (`@Aspect`) apply cheyalevu.
+
+Enduku? Imagine BPP 'A' anedi BPP 'B' ni process cheyali anukondi. Kani BPP 'B' anedi BPP 'A' ni process cheyali. Appudu infinite loop vastundi! Spring ee samasyani, "Anni BPPs special. Avi okarini okaru process chesukovu" ani cheppi avoid chestundi.
+
+**Mermaid Diagram: The Full Factory Flow**
+```mermaid
+graph TD
+    A(Bean Definitions ni Load cheyadam) --> B{BeanFactoryPostProcessor};
+    B -- Blueprints ni modify chestundi --> A;
+    A --> C(Beans ni Instantiate cheyadam);
+    C -- Prati bean kosam --> D{BeanPostProcessor};
+    D -- Instance ni Modify/Wrap chestundi --> E(Ready Bean);
+
+    subgraph BPP Execution Order
+        direction LR
+        O1["@Order(1)"] --> O2["@Order(10)"] --> O3["@Order(100)"];
+    end
+
+    style B fill:#d4fada
+    style D fill:#cde4ff
+```
+
+Ee concept tho, nuvvu Spring container yokka lothulaloki velli vachavu. Ippudu nuvvu దేనికైనా ready! `Abhinandanalu!` (Congratulations!) 🎉
