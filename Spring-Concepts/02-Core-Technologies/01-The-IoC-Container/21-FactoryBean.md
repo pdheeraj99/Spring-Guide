@@ -22,20 +22,19 @@ Ee complex logic antha manam `@Bean` methods lo petti messy cheyakunda, oka sepa
 
 **The Lifecycle with `FactoryBean`**
 ```mermaid
+%%{init: {'theme': 'dark'}}%%
 sequenceDiagram
     participant Client as Your App Code
     participant Container as Spring Container 🏭
     participant Factory as MyFactoryBean ✨
-    participant Product as The Object You Want
 
     Client->>Container: context.getBean("myProduct")
     Note over Container: "myProduct" is defined as a FactoryBean.
 
     Container->>+Factory: Calls getObject() on the factory bean
-    Factory->>Product: Creates the actual product object
-    Product-->>-Factory: returns product
+    Note right of Factory: Factory creates the 'Product' object internally.
+    Factory-->>-Container: returns the created Product object
 
-    Factory-->>Container: returns product
     Container-->>Client: returns the final product object
 ```
 
