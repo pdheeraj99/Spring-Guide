@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- This is the parent bean definition template -->
+    <bean id="parentCar" class="io.mawa.spring.core.inheritance.ParentBean">
+        <property name="brand" value="Mawa Motors"/>
+        <property name="engine" value="1000cc"/>
+    </bean>
+
+    <!-- This child bean inherits the brand and engine from the parent -->
+    <bean id="sportsCar" class="io.mawa.spring.core.inheritance.ChildBean" parent="parentCar">
+        <property name="spoiler" value="true"/>
+    </bean>
+
+    <!-- This child bean inherits the brand but overrides the engine -->
+    <bean id="luxuryCar" class="io.mawa.spring.core.inheritance.ChildBean" parent="parentCar">
+        <property name="engine" value="1500cc"/> <!-- Overriding the parent's value -->
+        <property name="leatherSeats" value="true"/>
+    </bean>
+
+</beans>
