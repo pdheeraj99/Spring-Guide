@@ -19,21 +19,23 @@ Spring's `Resource` interface is exactly that universal key. Adi file system, cl
 
 ```mermaid
 graph TD
-    subgraph "Different Types of Resources"
-        A[File on Disk 💾];
-        B[File in Classpath (JAR) 📦];
-        C[File on a Website (URL) 🌐];
+    subgraph "Physical Resources & Specific Implementations"
+        A[File on Disk 💾] --> ImplA(FileSystemResource)
+        B[File in Classpath 📦] --> ImplB(ClassPathResource)
+        C[File via URL 🌐] --> ImplC(UrlResource)
     end
 
-    subgraph "Spring's Unified Approach"
-        D{Resource Interface};
+    subgraph "Spring's Unified Abstraction"
+        D{Resource Interface}
     end
 
-    A -- is handled by --> D;
-    B -- is handled by --> D;
-    C -- is handled by --> D;
+    ImplA -- implements --> D
+    ImplB -- implements --> D
+    ImplC -- implements --> D
 
-    style D fill:#f9f,stroke:#333,stroke-width:4px
+    style D fill:#cde4ff,stroke:#004a9e,stroke-width:3px
+    classDef impl fill:#fff2cc,stroke:#d6b656,stroke-width:2px
+    class ImplA,ImplB,ImplC impl
 ```
 
 ### Important Methods of the `Resource` Interface
