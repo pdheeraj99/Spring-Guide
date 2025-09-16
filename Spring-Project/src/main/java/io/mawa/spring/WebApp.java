@@ -36,6 +36,9 @@ public class WebApp {
             }
         }
         System.out.println("------------------------------------------------------\n");
+
+        // Exit the application after the demo runs
+        SpringApplication.exit(context, () -> 0);
     }
 
 }

@@ -4,6 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -33,5 +38,8 @@ public class ResourceLoaderDemo implements CommandLineRunner {
              BufferedReader br = new BufferedReader(isr)) {
             br.lines().forEach(System.out::println);
         }
+
+        // Exit the application after the demo runs
+        SpringApplication.exit(context, () -> 0);
     }
 }

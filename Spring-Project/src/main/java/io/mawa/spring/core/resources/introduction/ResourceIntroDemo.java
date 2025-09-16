@@ -38,7 +38,11 @@ public class ResourceIntroDemo {
         System.out.println("Resource is a file?   : " + resource.isFile());
         System.out.println("Filename              : " + resource.getFilename());
         System.out.println("Description           : " + resource.getDescription());
-        System.out.println("URL                   : " + resource.getURL());
+        if (resource.exists()) {
+            System.out.println("URL                   : " + resource.getURL());
+        } else {
+            System.out.println("URL                   : [Does not exist]");
+        }
     }
 
     private static void readResourceContent(Resource resource) throws Exception {
