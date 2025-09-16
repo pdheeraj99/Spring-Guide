@@ -36,6 +36,28 @@ In a full Spring Boot application, if you have a `messages.properties` file, Spr
 
 Programmatically, you can create one yourself, usually a `ResourceBundleMessageSource`, and tell it where to find your message files.
 
+## Example in Action 🎬
+
+Let's see how we can use a `MessageSource` to translate the errors from our `BindingResult`.
+
+```java
+// 1. Create a MessageSource and point it to our properties file
+ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+messageSource.setBasename("messages"); // Looks for messages.properties, etc.
+
+// Assume 'results' is the BindingResult from our DataBinder
+BindingResult results = dataBinder.getBindingResult();
+
+// 2. Iterate over the errors and translate them
+if (results.hasErrors()) {
+    results.getAllErrors().forEach(error -> {
+        String message = messageSource.getMessage(error, Locale.US);
+        System.out.println(" - " + message);
+    });
+}
+```
+Instead of printing the raw error code, we now get a clean, user-friendly message!
+
 Here's the flow:
 
 ```mermaid

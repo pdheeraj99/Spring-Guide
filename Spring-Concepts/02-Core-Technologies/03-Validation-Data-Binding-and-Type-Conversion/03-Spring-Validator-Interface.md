@@ -39,6 +39,42 @@ The `errors` object is where you report your findings. The two most common metho
 *   `reject(String errorCode, String defaultMessage)`:
     *   Use this for a **global error** that isn't tied to a single field, but to the object as a whole.
 
+## Example in Action 🎬
+
+Here is the code for our specialist detective, the `RegistrationFormValidator`. It checks for our complex cross-field password rule.
+
+```java
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+public class RegistrationFormValidator implements Validator {
+
+    /**
+     * This Validator only works with RegistrationForm instances.
+     */
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return RegistrationForm.class.equals(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        RegistrationForm form = (RegistrationForm) target;
+
+        // Rule: Password must not be empty
+        if (form.getPassword() == null || form.getPassword().trim().isEmpty()) {
+            errors.rejectValue("password", "password.empty", "Password cannot be empty.");
+        }
+
+        // Rule: Passwords must match
+        if (form.getPassword() != null && !form.getPassword().equals(form.getConfirmPassword())) {
+            errors.rejectValue("confirmPassword", "password.mismatch", "Passwords do not match.");
+        }
+    }
+}
+```
+Notice how clean it is. We are putting pure validation logic in this class, completely separate from our business logic or web controllers.
+
 ## How it Works: A Visual
 
 Here's how a custom validator fits into the process.

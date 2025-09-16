@@ -23,6 +23,33 @@ Using a `DataBinder` is a two-step process:
 
 The results of both binding and validation are stored in a special `Errors` object called a `BindingResult`.
 
+## Example in Action 🎬
+
+Here’s how you would programmatically use the `DataBinder` to tie everything together.
+
+```java
+// 1. Create the target object and the DataBinder
+RegistrationForm form = new RegistrationForm(null, null, null);
+DataBinder dataBinder = new DataBinder(form);
+
+// 2. Assign our custom validator to it
+dataBinder.setValidator(new RegistrationFormValidator());
+
+// 3. Simulate raw input data (like from a web request)
+MutablePropertyValues pvs = new MutablePropertyValues();
+pvs.add("username", "mawa_dev");
+pvs.add("password", "password123");
+pvs.add("confirmPassword", "password456"); // Mismatched!
+
+// 4. Bind the data and then validate it
+dataBinder.bind(pvs);
+dataBinder.validate();
+
+// 5. Get the results (which will contain our password mismatch error)
+BindingResult results = dataBinder.getBindingResult();
+```
+As you can see, the `DataBinder` acts as a central coordinator for the whole process!
+
 ## The Flow: A Visual Diagram
 
 Let's see the complete picture of how data flows through the `DataBinder`.

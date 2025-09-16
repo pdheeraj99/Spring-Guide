@@ -22,6 +22,27 @@ Mawa, idi chala important point. **Every Spring `ApplicationContext` is also a `
 
 Manam separate ga `DefaultResourceLoader` create cheyanakkarledu. Manam direct ga mana `ApplicationContext` nunchi resources ni adagochu.
 
+### Example in Action 🎬
+In any of your Spring beans (`@Component`, `@Service`, etc.), you can just autowire the `ApplicationContext` and use it to get resources.
+
+```java
+@Component
+public class MyDemoBean implements CommandLineRunner {
+
+    // The ApplicationContext itself is the ResourceLoader!
+    @Autowired
+    private ApplicationContext context;
+
+    @Override
+    public void run(String... args) throws Exception {
+        // Use the context to get a resource
+        Resource resource = context.getResource("classpath:my-resource.txt");
+
+        System.out.println("Resource exists: " + resource.exists());
+    }
+}
+```
+
 ```mermaid
 graph TD
     subgraph "Your Code"
