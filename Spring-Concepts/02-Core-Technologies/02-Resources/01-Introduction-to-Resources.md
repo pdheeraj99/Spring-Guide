@@ -50,9 +50,6 @@ Ee universal key ki konni important methods unnayi, as per the documentation:
 -   `String getFilename()`: Resource file name ni istundi.
 -   `String getDescription()`: A detailed description of the resource, useful for error messages (e.g., "file [/path/to/file.txt]").
 
-> **A Quick Pro-Tip 💡: The `WritableResource`**
-> Mawa, konni resources (like `FileSystemResource`) ki manam data *rayochu* (write) kuda! Alanti special resources `WritableResource` ane inkoka interface ni implement chestayi. Just gurtupettuko, `Resource` anedi chadavadaniki (read), `WritableResource` anedi rayadaniki (write) ani. Simple!
-
 Ee methods use chesi, manam resource type gurinchi tension padakunda, consistent code rayochu.
 
 ### A Quick Example 🧑‍💻

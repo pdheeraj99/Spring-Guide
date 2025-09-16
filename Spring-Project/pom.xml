@@ -27,12 +27,6 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter for Aspect-Oriented Programming -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
-
         <!-- JSR-250 Annotations for @PostConstruct, etc. -->
         <dependency>
             <groupId>jakarta.annotation</groupId>
@@ -46,10 +40,11 @@
             <version>2.0.1</version>
         </dependency>
 
-        <!-- Spring Boot Starter for Validation -->
+        <!-- JSR-330 Annotations for @Inject, @Named -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>2.0.1</version>
         </dependency>
     </dependencies>
 

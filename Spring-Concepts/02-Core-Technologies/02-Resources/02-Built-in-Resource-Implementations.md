@@ -19,11 +19,9 @@ Spring chala implementations istundi, kani ee moodu manam 95% of the time vadata
     // Looks for pom.xml in the project's root directory
     Resource resource = new FileSystemResource("pom.xml");
     ```
-4.  **`PathResource`**: The "Modern File" Key 🚀. Idi `FileSystemResource` ki modern `java.nio.file.Path` alternative. Performance and features konchem better untayi.
 
 **Other Special Keys:**
 -   `ServletContextResource`: Web applications lo `WEB-INF` folder lanti places nunchi resource load cheyadaniki.
--   `InputStreamResource`: Oka `InputStream` ni (like a data stream from a network connection) direct ga resource la treat cheyadaniki. 💧
 -   `ByteArrayResource`: Oka byte array ni (memory lo unna data) oka resource la treat cheyadaniki.
 
 ```mermaid
@@ -33,11 +31,9 @@ graph TD
         B[UrlResource];
         C[ClassPathResource];
         D[FileSystemResource];
-        G[PathResource];
     end
     subgraph "Other Special Keys"
         E[ServletContextResource];
-        H[InputStreamResource];
         F[ByteArrayResource];
     end
     A --> B;
@@ -45,8 +41,6 @@ graph TD
     A --> D;
     A --> E;
     A --> F;
-    A --> G;
-    A --> H;
 ```
 
 ### The Magic of Prefixes
