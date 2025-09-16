@@ -11,9 +11,11 @@ Spring chala implementations istundi, kani ee moodu manam 95% of the time vadata
 1.  **`UrlResource`**: The Internet Key 🌐. Idi `java.net.URL` ni wrap chestundi. `http://`, `https://`, `ftp://`, or even `file://` lanti standard URL prefixes unna ഏ-resource ni ayina access chestundi.
 2.  **`ClassPathResource`**: The "Inside the Box" Key 📦. Idi mana application classpath nunchi resource ni load chestundi. Ante, mana project `src/main/resources` folder lo or mana dependency `jar` files lo unna files ni access cheyadaniki idi perfect. This is probably the most common one you'll see.
 3.  **`FileSystemResource`**: The "On My Computer" Key 🖥️. Idi mana computer's file system lo ekkado unna file ni direct ga access cheyadaniki. You need to provide the full or relative path to the file.
+4.  **`PathResource`**: The "Modern File" Key 🚀. Idi `FileSystemResource` ki modern `java.nio.file.Path` alternative. Performance and features konchem better untayi.
 
 **Other Special Keys:**
 -   `ServletContextResource`: Web applications lo `WEB-INF` folder lanti places nunchi resource load cheyadaniki.
+-   `InputStreamResource`: Oka `InputStream` ni (like a data stream from a network connection) direct ga resource la treat cheyadaniki. 💧
 -   `ByteArrayResource`: Oka byte array ni (memory lo unna data) oka resource la treat cheyadaniki.
 
 ```mermaid
@@ -23,9 +25,11 @@ graph TD
         B[UrlResource];
         C[ClassPathResource];
         D[FileSystemResource];
+        G[PathResource];
     end
     subgraph "Other Special Keys"
         E[ServletContextResource];
+        H[InputStreamResource];
         F[ByteArrayResource];
     end
     A --> B;
@@ -33,6 +37,8 @@ graph TD
     A --> D;
     A --> E;
     A --> F;
+    A --> G;
+    A --> H;
 ```
 
 ### The Magic of Prefixes

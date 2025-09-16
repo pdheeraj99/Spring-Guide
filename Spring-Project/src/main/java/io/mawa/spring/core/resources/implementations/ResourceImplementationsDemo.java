@@ -18,8 +18,18 @@ public class ResourceImplementationsDemo {
         readResourceContent(classpathResource);
 
         System.out.println("\n\n--- 2. Directly creating a FileSystemResource ---");
-        Resource fileSystemResource = new FileSystemResource("pom.xml");
+        // For a robust example, let's create a temporary file
+        java.io.File tempFile = java.io.File.createTempFile("filesystem-resource-demo", ".txt");
+        tempFile.deleteOnExit(); // Clean up after the JVM exits
+
+        // Write some content to our temporary file
+        try (java.io.PrintWriter writer = new java.io.PrintWriter(tempFile)) {
+            writer.println("Hello from a temporary file system resource!");
+        }
+
+        Resource fileSystemResource = new FileSystemResource(tempFile);
         printResourceDetails(fileSystemResource);
+        readResourceContent(fileSystemResource);
     }
 
     private static void printResourceDetails(Resource resource) throws Exception {

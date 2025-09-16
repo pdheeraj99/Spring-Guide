@@ -1,6 +1,10 @@
 package io.mawa.spring.core.resources.dependencies;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
@@ -9,13 +13,16 @@ import java.io.IOException;
 import java.util.Arrays;
 
 @Component
-public class ResourceDependencyBean {
+public class ResourceDependencyBean implements CommandLineRunner {
 
     @Value("${template.path}")
     private Resource template;
 
     @Value("${all.xml.files.path}")
     private Resource[] xmlFiles;
+
+    @Autowired
+    private ApplicationContext context;
 
     @PostConstruct
     public void showInjectedResources() throws IOException {
@@ -28,5 +35,11 @@ public class ResourceDependencyBean {
         Arrays.stream(xmlFiles).forEach(resource ->
                 System.out.println(" - " + resource.getFilename())
         );
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
+        // Exit the application after the demo runs
+        SpringApplication.exit(context, () -> 0);
     }
 }
