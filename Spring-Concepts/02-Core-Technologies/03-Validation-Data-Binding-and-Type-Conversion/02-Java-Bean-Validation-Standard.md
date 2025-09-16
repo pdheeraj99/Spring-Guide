@@ -33,6 +33,34 @@ For 90% of your validation needs, these standard annotations are all you need. L
 *   `@Pattern(regexp=)`: For when you need the ultimate power of a regular expression.
     *   `@Pattern(regexp = "[a-zA-Z0-9]+") String username;`
 
+## Example in Action 🎬
+
+Here is a quick look at how these annotations come together in a simple `User` class. Notice how we can add a custom `message` to each annotation.
+
+```java
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class User {
+
+    @NotBlank(message = "Username cannot be blank!")
+    @Size(min = 3, max = 15, message = "Username must be between 3 and 15 characters.")
+    private String username;
+
+    @NotBlank(message = "Email cannot be blank!")
+    @Email(message = "Please provide a valid email address.")
+    private String email;
+
+    @Min(value = 18, message = "User must be at least 18 years old.")
+    private int age;
+
+    // Constructors, Getters, and Setters...
+}
+```
+In our code demo, we'll create a program that actually validates this object and prints the error messages!
+
 ## How it Works: A Visual
 
 Here’s a simple diagram showing how we apply these annotations to a bean. The validator then checks the bean against these rules.
