@@ -114,8 +114,130 @@ mvn compile exec:java -Dexec.mainClass="io.mawa.spring.core.autowiring.Autowirin
 ```
 Output chuste, manam ekkada manually wire cheyakapoina, anni services lo `CustomerRepository` perfect ga inject avvadam chudochu.
 
-### The "What if...?" Problem (Ambiguity) 🧐
+---
+<br>
 
-Spring automatic ga chestundi super, kani okavela daniki confusion vasthe? Rendu same type unna beans unte (e.g., `DatabaseCustomerRepository` and `InMemoryCustomerRepository` rendu unte), edi inject cheyalo daaniki ela telustundi? Appudu Spring "Ambiguous dependency" ani error istundi.
+### ✨ @Autowired Superpowers!
 
-Ee confusion ni manam `@Primary` and `@Qualifier` ane secret weapons tho ela solve cheyalo, manam next sections lo chuddam! Stay tuned! 🚀
+`@Autowired` basics neeku telusu. Ippudu konni tricks nerchukundam, avi nee code ni inka clean ga, safe ga, and powerful ga chestayi.
+
+#### 1. The Invisible `@Autowired` 👻
+
+Modern Spring lo (version 4.3 and tarvata), oka class ki **oke okka constructor** unte, daani meeda `@Autowired` rayalsina avasaram ledu!
+
+Spring chala smart, adi, "Hey, ee object ni build cheyadaniki oke oka daari undi, so nenu aa constructor ne dependency injection kosam vadestha" ani anukuntundi.
+
+**Paatha Paddati:**
+```java
+@Component
+public class ReportGenerator {
+    private final DataFetcher fetcher;
+
+    @Autowired // <-- Idi mundu avasaram unde
+    public ReportGenerator(DataFetcher fetcher) {
+        this.fetcher = fetcher;
+    }
+}
+```
+
+**Kotha, Clean Paddati:**
+```java
+@Component
+public class ReportGenerator {
+    private final DataFetcher fetcher;
+
+    // @Autowired ledu! Ayina pani chestundi!
+    public ReportGenerator(DataFetcher fetcher) {
+        this.fetcher = fetcher;
+    }
+}
+```
+Idi nee code ni clean ga chestundi and ippudu ide recommend chese style. `Enta neat ga undho chudandi!`
+
+#### 2. The Optional Dependency: `required = false` 🤔
+
+Okavela neeku oka bean kavali, kani adi context lo lekapovachu anukundam. Udaharanaki, oka `PremiumFeature`, adi kevalam app "pro" version lo matrame load avutundi. Nuvvu daanini simple ga `@Autowired` cheste, aa bean lekapothe application startup lo ne crash avutundi.
+
+Solution `required = false`.
+
+```java
+@Service
+public class UserDashboard {
+
+    private final AnalyticsService analytics;
+    private PremiumFeature premiumFeature; // Idi null undochu!
+
+    // Ee main dependency avasaram
+    public UserDashboard(AnalyticsService analytics) {
+        this.analytics = analytics;
+    }
+
+    // Ee dependency OPTIONAL
+    @Autowired(required = false)
+    public void setOptionalPremiumFeature(PremiumFeature feature) {
+        this.premiumFeature = feature;
+        if (feature != null) {
+            System.out.println("Premium feature enabled! 👑");
+        }
+    }
+}
+```
+Idi Spring ki cheptundi: "`PremiumFeature` bean kosam vethuku. Dorikithe, inject cheyi. Dorakkapothe, no problem! Daanini `null` ga vadhilesi munduku vellu." Idi nee application crash avvakunda aputundi.
+
+#### 3. The "Gather 'Em All" Technique: Injecting a List! 🗃️
+
+Idi Spring lo unna atyanta `powerful` patterns lo okati. Neeku oka interface undi, daaniki multiple implementations unte? Udaharanaki, `NotificationSender` ane interface ki, `EmailSender`, `SMSSender`, and `PushNotificationSender` ane classes unnayyi anukundam.
+
+Vaatini anni ela teeskuntav? Simple ga aa interface type unna `List` ni inject cheyi!
+
+**The Interface:**
+```java
+public interface NotificationSender {
+    void send(String message);
+}
+```
+
+**The Implementations:**
+```java
+@Component public class EmailSender implements NotificationSender { ... }
+@Component public class SMSSender implements NotificationSender { ... }
+@Component public class PushNotificationSender implements NotificationSender { ... }
+```
+
+**The Magic:**
+```java
+@Service
+public class NotificationService {
+
+    private final List<NotificationSender> allSenders;
+
+    // Spring, NotificationSender ni implement chese anni beans ni
+    // vethiki, ee list lo inject chestundi!
+    public NotificationService(List<NotificationSender> allSenders) {
+        this.allSenders = allSenders; // Ikkada 3 objects untayi!
+    }
+
+    public void notifyAll(String message) {
+        for (NotificationSender sender : allSenders) {
+            sender.send(message); // Email, SMS, and push notification pampistundi!
+        }
+    }
+}
+```
+
+**Mermaid Diagram: The Collector**
+```mermaid
+graph TD
+    subgraph Spring Container
+        A(EmailSender)
+        B(SMSSender)
+        C(PushNotificationSender)
+    end
+
+    D(NotificationService Constructor) -- Adigindi `List<NotificationSender>` --> E{Spring};
+    E -- Anni implementations ni gather chesindi --> F[List: [A, B, C]];
+    F -- Injects into --> D;
+```
+
+**Cliffhanger:**
+Sare, beans ni ela inject cheyalo chusam. Kani manam eppudu oka "singleton" bean ni inko "singleton" bean loki inject chesam. Okavela nuvvu oka "prototype" bean (prati sari kotha object) ni oka singleton loki inject cheyali anukunte? Idi oka chala tricky problem ni create chestundi! Singleton aa prototype ni okkasari teeskuni, daanini eppatiki pattukuni untundi, prototype uddeshanne debba testundi! Ee samasyani ela solve cheyali? Daaniki samadhanam `@Lookup` ane oka vichitramaina and powerful annotation lo undi... adi next chuddam!

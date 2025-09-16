@@ -78,4 +78,68 @@ Session ni test cheyali ante, manam cookies ni manage cheyali. `curl` lo ee pani
     ```
     *Output should be an empty cart!*
 
-Ee code antha manam next steps lo create cheddam! Ready aa? 🛒🔥
+---
+<br>
+
+### 🚀 Pro-Tip: Sessions in a Multi-Server World! (Clustering)
+
+Nee app pedda hit aindi anuko! Nuvvu inka okka server meeda run cheyatledu, oka load balancer venakala chala servers unna cluster ni vadutunnav.
+
+Ippudu oka pedda problem vastundi.
+*   **Request 1:** User vachi, tana cart lo oka book add chesadu. Load balancer aa request ni **Server A** ki pampistundi. Shopping cart object anedi Server A memory lo create avutundi.
+*   **Request 2:** Ade user vachi, tana cart lo oka pen add chesadu. Ee sari load balancer aa request ni **Server B** ki pampistundi. Server B ki, Server A lo unna shopping cart gurinchi em teliyadu! User ki tana cart empty ga kanipistundi. Pedda disaster! 😱
+
+**The Solution: Session Replication**
+Application servers (like Tomcat), cluster lo unna anni servers ki session data ni "replicate" (copy) cheyagalavu. Ante, Server A lo data update aite, adi Server B and C ki kuda pampistundi.
+
+**The Golden Rule for Replication:**
+Oka object ni network dwara oka server nunchi inkoti ki copy cheyali ante, adi "serializable" ga undali. Ante, daanini bytes stream ga marchagalagali.
+
+Anduke, nee session-scoped bean **tappakunda `java.io.Serializable` interface ni implement cheyali.**
+
+**The Code Change (Chinnade, kani chala critical!):**
+```java
+import java.io.Serializable; // <-- Step 1: Import cheyi
+import java.util.List;
+import java.util.ArrayList;
+
+// @Scope, @Component, etc.
+public class ShoppingCart implements Serializable { // <-- Step 2: Implement cheyi!
+
+    // Idi serialization kosam oka special ID. Pettadam manchi practice.
+    private static final long serialVersionUID = 1L;
+
+    private List<String> items = new ArrayList<>();
+
+    // ... migatha methods anni same
+}
+```
+Nuvvu `implements Serializable` marchipothe, session replication fail avutundi, and clustered environment lo nee users ki chala बेकार anubhavam vastundi. Ee chinna vishayam telusukovadam, nuvvu entha anubhavam unna developer vo chupistundi.
+
+**Mermaid Diagram: The Session Copy Machine**
+```mermaid
+graph TD
+    LB(Load Balancer) --> S1(Server A);
+    LB --> S2(Server B);
+    LB --> S3(Server C);
+
+    subgraph "User yokka మొదటి Request"
+        U(User) -- book add chestadu --> LB;
+        S1 -- create chestundi --> SC1(Cart with Book);
+    end
+
+    SC1 -- Tomcat replicate chestundi --> SC2(Copy of Cart on S2);
+    SC1 -- Tomcat replicate chestundi --> SC3(Copy of Cart on S3);
+
+    subgraph "User yokka రెండో Request"
+        U2(User) -- pen add chestadu --> LB;
+        S2 -- daggara already cart undi! --> CartOK(Cart lo ippudu book + pen unnayi);
+    end
+
+    style SC1 fill:#cde4ff
+    style SC2 fill:#cde4ff
+    style SC3 fill:#cde4ff
+```
+
+**Cliffhanger:**
+Session scope anedi oka user yokka browsing session varake untundi. Kani manaki inka pedda scope unna bean kavali anukunte? Ante, **andaru users** tho, **anni sessions** lo, web application antha காலம் share cheskune oka object? Udaharanaki, country codes cache or global application configuration lantiది. Idi `application` scope. Kani... adi `singleton` laage anipinchadam leda? Mari daaniki, deeniki teda enti? Chuddam!

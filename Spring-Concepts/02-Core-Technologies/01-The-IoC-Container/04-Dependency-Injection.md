@@ -75,5 +75,59 @@ This is a pizza with Cheese Topping 🧀 (constructor injected).
 --- Setter Injection Demo ---
 This is a pizza with Tomato Sauce 🍅 (setter injected).
 ```
+---
+<br>
 
-Chusava! Container eh automatic ga correct dependencies ni correct place lo inject chesindi. That's the power of DI! Next manam dependencies ni inka detailed ga ela configure cheyalo chuddam. 🔥
+### 🤫 Field Injection: The "Easy Way Out"
+
+Dependencies ni inject cheyadaniki inko moodo (`third`) way undi, adi chudadaniki chala simple ga untundi. Just `@Autowired` ni direct ga field meeda petteyali. Constructors levu, setters levu. `Chala simple ga undhi, kada?`
+
+Idi oka magician, pizza base meeda topping ni gaali lo nunchi teppinchiనట్లు. ✨ Chudadaniki cool ga untundi, kani adi akkada ki ela vachindi? Anedi oka secret!
+
+```java
+@Component
+public class Pizza {
+
+    @Autowired
+    private Topping topping; // Look ma, no hands!
+
+    public String getPizza() {
+        return "A delicious pizza with " + topping.getName();
+    }
+}
+```
+
+#### The Good, The Bad, and The Ugly
+
+Enduku idi kontha mandi vadataru?
+*   **The Good (Conciseness):** Code chala chinna ga, clean ga untundi. Boilerplate taggistundi.
+
+Enduku senior developers 'VADDHU' antaru?
+*   **The Bad (Hides Dependencies):** Evaraina `Pizza` object ni create chesinappudu, daaniki lopalaki oka `Topping` kavali ani వాళ్ళకి teliyadu. Aa dependency constructor lo kanipinchadu. Idi oka hidden trap!
+*   **The Ugly (Terrible for Testing):** Ide andari kante pedda problem. Manam unit test rasetappudu, oka `Pizza` object create chesi, daaniki oka *mock* `Topping` ivvali anukuntam. Field injection tho adi ela chestam? Cheyalem! `topping` field anedi private. Manam aa mock topping ni pizza loki pampadaniki complex Java "reflection" vadalsi vastundi, adi chala bad practice. Cheese kosam surgery chesinattu. 👨‍⚕️
+
+**Mermaid Diagram: The Hidden Danger**
+```mermaid
+graph TD
+    subgraph Nee Code
+        A(new Pizza()) -- Pizza object ni create chestundi
+    end
+    subgraph Spring Magic World
+        B(Topping) -- Magic ga lopaliki veltundi --> C((Pizza Object))
+    end
+    subgraph Nee Unit Test
+        D(Mock Topping) -- Pizza loki vellali --> E{???};
+        E -- Vellaledu! Field private --> F[Test Fails or uses ugly reflection];
+    end
+
+    A --> C;
+```
+
+#### The Final Verdict 👨‍⚖️
+
+*   **Constructor Injection:** The Hero. Eppudu ide vadandi. 🥇
+*   **Setter Injection:** The Sidekick. Optional dependencies kosam matrame. 🥈
+*   **Field Injection:** The Villain in disguise. Friendly ga kanipinchina, chala problems testundi. Real projects lo avoid cheyandi. Tarvata meere naku thanks cheptaru! 🥉
+
+**Cliffhanger:**
+Okay, team! `Pizza` ki `Topping` kavali ani telusu. Kani okavela mana pizzeria lo chala toppings unte? `MushroomTopping`, `PaneerTopping`, `OliveTopping`... ivi anni kuda `Topping` eh! Appudu Spring `@Autowired private Topping topping;` ani chusi confuse avutundi. "Ee mooditlo neeku edi kavali?!" 🤯 Deenini `Ambiguity` error antaru. Ee confusion ni ela solve cheyali? Spring ki correct ga edi kavalo ela cheppali? Daaniki samadhanam rendu powerful annotations lo daagi undi... adi next episode lo!

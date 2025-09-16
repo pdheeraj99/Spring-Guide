@@ -63,4 +63,52 @@ Application scope is great for things like global caches, application version in
 
 Manam `curl` tho ee controller ni enni sarlu call chesina, different sessions nunchi call chesina, manaki eppudu oke startup time vastundi, because there is only one "Town Clock Tower".
 
-Let's build it! 🚀
+---
+<br>
+
+### ⚠️ DANGER: Thread Safety Red Alert!
+
+`singleton` scope lo manam chusina 'shared whiteboard' problem gurtunda? Adi ikkada kuda apply avutundi, and inthe dangerous kuda!
+
+Oka `application`-scoped bean anedi, nee application lo unna **prati okka user** share cheskune okka object. Aa bean lo state marutunte (e.g., counter, list, or user peru), nuvvu disaster ni korukuntunnav anate. Chala user requests (threads) oke sari daanini marchali ani try cheste, data corrupt avutundi.
+
+**Golden Rule ide:** Application-scoped beans **tappakunda STATELESS ga undali**. Avi read-only, global information (application version, country codes list, configuration settings) ni store cheyadaniki perfect. Kani, maarpu chende data ni store cheyadaniki assalu paniki ravu.
+
+**Mermaid Diagram: The Town Crier**
+```mermaid
+graph TD
+    subgraph Good Use (Stateless)
+        A(App-Scoped Bean with List of Countries) -- Chaduvutunnadu --> T1(User 1);
+        A -- Chaduvutunnadu --> T2(User 2);
+        A -- Result --> OK(Safe & Consistent);
+    end
+    subgraph Bad Use (Stateful)
+        B(App-Scoped Bean with `lastVisitor` field) -- Raastunnadu --> T3(User 1);
+        B -- Overwrite chestunnadu --> T4(User 2);
+        B -- Result --> Chaos(Data is wrong!);
+    end
+```
+
+### 🚀 Pro-Tip: Talking to the "Outside World"
+
+`application` and `singleton` scope ki unna teda ni inka clear ga cheppe oka chinna detail undi. Application-scoped bean anedi **`ServletContext` lo oka attribute ga store avutundi**.
+
+**Ante enti?**
+Ante, nee web app lo unna non-Spring parts kuda, for example, oka paatha JSP page or legacy Servlet, ee bean ni access cheyagalavu!
+
+Udaharanaki, neeku `globalConfig` ane oka application-scoped bean undi anukundam.
+```java
+// Edo oka paatha, non-Spring Servlet lo...
+public void doGet(HttpServletRequest request, HttpServletResponse response) {
+    ServletContext servletContext = request.getServletContext();
+
+    // Nuvvu Spring bean ni ServletContext nunchi access cheyochu!
+    GlobalConfig config = (GlobalConfig) servletContext.getAttribute("globalConfig");
+
+    // ... and daanini vadukovachu!
+}
+```
+Kani, `singleton`-scoped bean anedi kevalam Spring `ApplicationContext` lopalane untundi, and ila automatic ga expose avvadu. Anduke, `application` scope anedi Spring ni paatha Java web technologies tho integrate cheyadaniki use avutundi.
+
+**Cliffhanger:**
+Bean scopes meeda manam master aipoyam! Beans ela pudatayo, eppudu pudatayo, entha kalam brathukutayo manaki telusu. Kani, oka bean puttagane or chanipoye mundu jarige moments gurinchi enti? Aa moments lo manam mana custom logic ni run cheyochha? Biddapu modalati edupu or actor yokka final bow lantiవి? Yes, cheyochu! Daanine lifecycle callbacks antaru. Next episode lo `@PostConstruct` and `@PreDestroy` gurinchi chuddam!

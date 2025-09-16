@@ -104,4 +104,117 @@ mvn compile exec:java -Dexec.mainClass="io.mawa.spring.core.bean.BeanOverviewDem
 3. Created via an instance factory method! (A powerful pattern)
 ```
 
-Anthe mawa! Ippudu neeku bean ante ento, daanni enni rakalu ga create cheyochu anedi oka clear idea vachindi anukuntunna. Next manam dependencies gurinchi matladukundam. Ready aa? 💪
+---
+<br>
+
+### ✨ The Special One: `FactoryBean` Interface
+
+Ippati varaku manam beans create cheyadaniki konni patterns chusam. Ippudu, Spring manaki ichina oka special tool gurinchi matladukundam: the `FactoryBean` interface. Idi oka pattern kadu, idi Spring ichina oka powerful interface!
+
+**Asalu idi enti?** A `FactoryBean` anedi vere beans ni tayaru chese factory lanti bean. Ante, idi beans ni produce chese bean anamata! 🤯
+
+Oka chinna analogy: Normal `@Bean` anedi shop ki velli direct ga oka toy car konnattu. Kani `FactoryBean` anedi, manam oka complex Lego set koni, daanitho maname aa toy car ni *build* chesinattu. Ikkada `FactoryBean` anedi aa Lego set, adi produce chese object mana final toy car.
+
+#### The `FactoryBean` in Action
+
+Manam chala complex object ni create cheyali anukundam, for example, chala custom configuration steps unna oka `Car` anukundam.
+
+**Step 1: Mana `FactoryBean` ni Create Cheyadam**
+```java
+import org.springframework.beans.factory.FactoryBean;
+
+// Ee class eh oka bean, kani idi oka Car object ni PRODUCE chestundi.
+public class CarFactoryBean implements FactoryBean<Car> {
+
+    private String color;
+
+    // Manam ee factory ni kuda configure cheyochu!
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public Car getObject() throws Exception {
+        // Ikkada entha complex creation logic aina rayochu!
+        Car car = new Car();
+        car.setColor(this.color);
+        car.setEngine(new V8Engine()); // Inka logic undochu
+        System.out.println("CarFactoryBean oka custom car ni build chestondi!");
+        return car;
+    }
+
+    @Override
+    public Class<?> getObjectType() {
+        return Car.class;
+    }
+
+    @Override
+    public boolean isSingleton() {
+        return true; // Ikkada manam scope ni kuda control cheyochu!
+    }
+}
+```
+
+**Step 2: Daanini mana `@Configuration` lo Define Cheyadam**
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean(name = "myCar")
+    public CarFactoryBean carFactoryBean() {
+        CarFactoryBean factory = new CarFactoryBean();
+        factory.setColor("Red"); // Factory ni configure cheyadam
+        return factory;
+    }
+}
+```
+
+#### The "Magic" Trick 🎩
+
+Ippudu, asalu important vishayam! Nuvvu Spring container ni `"myCar"` ane bean adigithe, neeku em vastundi?
+
+```java
+// Idi em print chestundi?
+Car car = context.getBean("myCar", Car.class);
+System.out.println(car.getClass());
+```
+
+Neeku `CarFactoryBean` instance **RAADU**. Neeku `Car` object vastundi!
+
+**Output:**
+```
+CarFactoryBean is building a custom car!
+class com.example.Car
+```
+Spring chala smart. Adi ee bean `FactoryBean` ni implement chestondi ani chusi, automatic ga `getObject()` method ni call chesi, adi *produce* chesina object ni neeku istundi.
+
+#### The Interview "Gotcha": The `&` Symbol
+
+Appudu interviewer adugutadu, "Sare, kani naaku aa car kadu, aa factory object eh kavali, appudu em cheyali?"
+
+Aha! Appude manam ampersand (`&`) prefix vadali!
+
+```java
+// Factory produce chesina Car kosam:
+Car car = context.getBean("myCar", Car.class);
+
+// FactoryBean object kosam:
+FactoryBean factory = context.getBean("&myCar", FactoryBean.class);
+```
+
+**Mermaid Diagram: The Two-Faced Bean**
+```mermaid
+graph TD
+    subgraph Spring Container
+        A(Bean Definition: "&myCar")
+    end
+
+    B(Nee Code) -- "getBean("myCar")" --> C{Product: Car};
+    B -- "getBean("&myCar")" --> D{Factory: CarFactoryBean};
+
+    A -- produce chestundi --> C;
+    A -- asalu instance --> D;
+```
+
+**Cliffhanger:**
+Beans ni enni rakalu ga create cheyalo nerchukunnam. Ippudu vaatini kalapadam (wiring) gurinchi malli matladudam. Okavela oka dependency valla "chicken and egg" problem vaste? Ante, bean A ki bean B kavali, kani bean B ki malli bean A kavali! 🐔🥚 Deenini circular dependency antaru. Idi pedda disaster aa? Leka Spring daggara deenini solve cheyadaniki emaina secret trick unda? Chuddam...

@@ -61,8 +61,8 @@ Kani, explicit ga cheppali anukunte, `@Scope("singleton")` ani rayochu. But it's
 @Bean
 @Scope("singleton") // This is redundant but valid
 public MyService myService() {
-    return new MyService();
-}
+        return new MyService();
+    }
 ```
 
 ---
@@ -93,10 +93,68 @@ Both hash codes are the same. Spring returned the SAME instance!
 ```
 Chusava! Bean okkasare create ayyindi, and manaki rendu sarlu ade object vachindi. That's the singleton scope for you!
 
-**Bonus Point (XML world):**
-Old projects lo XML configuration unte, idi ila kanipistundi:
-```xml
-<bean id="myService" class="com.example.MyService" scope="singleton"/>
-<!-- scope="singleton" is default, so it can be omitted -->
+---
+<br>
+
+### ⚠️ DANGER ZONE: The Thread Safety Trap!
+
+Singleton bean anedi, oka busy office lo unna oke okka shared whiteboard lantiది. Andaru ade board ni vadataru. Ippudu imagine chesko, Person A vachi board meeda "Buy Milk" ani rasadu. At the exact same time, Person B vachi aa board ni erase chesi "Call Client" ani rasadu. Inka anthe, anukoni ghoram jarigipoindi! Person A yokka note eppatiki kanipinchadu.
+
+Singletons tho ide andari kante pedda `danger`. Oka web application lo, prathi user request anedi oka veru "person" (ante, oka veru thread). Vallandaru oke sari aa singleton bean yokka state ni (whiteboard meeda rayadam lantiది) marchali ani try cheste, neeku data corrupt avvadam, bugs ravadam, antha gola gola avvadam ఖాయం. Deenine "race condition" antaru.
+
+#### The Golden Rule of Singletons: BE STATELESS!
+
+Oka singleton bean, oka particular user ki or request ki sambandinchina data ni **store chesukokudadu**. Adi "stateless" ga undali. Daaniki dependencies undochu (avi kuda singletons), kani daanilo request ki maripoye instance variables undakudadu (e.g., `private int count;` or `private String currentUser;`).
+
+**BAD Singleton 👎 (Stateful - Chala Pramadakaram!)**
+```java
+@Service // Default ga Singleton
+public class VisitorCounter {
+    private int count = 0; // <--- DANGER! STATEFUL FIELD!
+
+    public void newVisitor() {
+        // Multi-threaded app lo, idi safe KADU!
+        // Rendu threads oke sari `count` value ni chadavachu,
+        // okati increment chese mundare inkoti kuda chadavochu.
+        this.count++;
+    }
+}
 ```
-That's it for our first scope! Next, we'll see the "every time a new one" friend: The Prototype Scope. Ready aa? 🔥
+
+**GOOD Singleton 👍 (Stateless - Safe!)**
+```java
+@Service // Default ga Singleton
+public class GreetingService {
+    // Ee dependency kuda oka stateless singleton. Safe!
+    private final MessageSource messageSource;
+
+    public GreetingService(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
+
+    // State (name) anedi method parameter ga vastondi.
+    // Adi class lo store avvatledu. PERFECT!
+    public String greet(String name) {
+        String template = messageSource.getGreetingTemplate();
+        return template.replace("{}", name);
+    }
+}
+```
+
+**Mermaid Diagram: The Whiteboard Problem**
+```mermaid
+graph TD
+    subgraph Bad Design (Stateful)
+        T1(User 1 Request) -- raastundi --> SB(Singleton Bean with `count` field);
+        T2(User 2 Request) -- ade samayaniki raastundi --> SB;
+        SB -- daari teestundi --> RC(Race Condition / Corrupt Data!);
+    end
+    subgraph Good Design (Stateless)
+        T3(User 1 Request) -- call chestundi greet("Alice") --> SS(Stateless Singleton);
+        T4(User 2 Request) -- call chestundi greet("Bob") --> SS;
+        SS -- State anedi method lo undi, bean lo kadu --> OK(Safe & Predictable);
+    end
+```
+
+**Cliffhanger:**
+Sare, singletons powerful kani stateless ga undali ani telisindi. Kani okavela manaki *nijaanga* prathi request ki oka separate object kavali anukunte? Prati sari adiginapudalla oka "fresh copy" kavali anukunte, dispenser nunchi prati drink ki oka kotha paper cup teeskunnattu? Akkade manaki `prototype` scope scene loki vastundi. Kani jagrattha... daanilo kuda oka dangerous trap undi! Next episode lo prototype scope yokka rahasyalu chuddam...

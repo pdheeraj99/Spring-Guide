@@ -115,7 +115,91 @@ So, the whole story is:
 2. You tell the **Spring Container** about these beans and their dependencies.
 3. The Spring Container uses **Inversion of Control (IoC)** to create them and wire them together.
 
-Ee foundation tho, manam next topic lo container ni ela use cheyalo chuddam! Ready aa? 🔥
+---
+<br>
 
-### Code Reference
-Mawa, ee topic pure ga concept matrame. Manam container ni, beans ni inka create cheyaledu. So, deeniki specific code example ippudu avasaram ledu. Next section **"Container Overview"** lo manam actual ga container ni instantiate chesi, code tho aadukundam. Appudu ee concept antha live lo chustav!
+### 💉 DI Showdown: The Three Injection Musketeers!
+
+`Mana` car analogy `lo`, car `ki` engine `kavali` anukundam. Kani `aa` engine `ni` car `lo` `ela pettali`? Ee paniki, Spring `manaki` moodu (`three`) main ways `ichindi`, avi three musketeers `laga` anamata! Okko daaniki okko style, okko superpower undi. Chuddam randi!
+
+#### 1. Constructor Injection (The Strong & Silent Type 💪)
+
+Idi chala recommend chese, and chala powerful vidhanam. Ikkada, manam dependencies ni direct ga constructor lo ne adugutam. Idi car factory tho, "Nuvvu car build cheyadam start chese mundu, mundu engine ready ga undali!" ani cheppinattu.
+
+```java
+@Component
+public class Car {
+    private final Engine engine;
+
+    // Engine anedi constructor dwara "inject" avutondi
+    @Autowired
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+}
+```
+
+**Deeni valle intha scene enduku?:**
+*   **Immutability:** `Car` object okasari create ayyaka, daani `Engine` ni marchalemu. Dependency anedi `final` ga untundi. Chala safe! 🛡️
+*   **Guaranteed Dependencies:** `Car` object anedi, daaniki avasaramaina `Engine` lekunda eppudu create avvadu. Ikkada `NullPointerException` risk undadu!
+*   **Clean & Honest:** Constructor signature chudagane, "Ee class build cheyadaniki, ee dependencies pakka kavali" ani clear ga cheptundi. Hidden surprises undavu.
+
+**Mermaid Diagram: The Unbreakable Bond**
+```mermaid
+graph TD
+    A[Car Constructor] -- Adigindi --> B(Engine);
+    B -- Andinchabadindi --> A;
+    A -- Create chesindi --> C{Car Object};
+    C -- `final` ga kaligi undi --> B;
+```
+
+#### 2. Setter Injection (The Flexible Friend 👋)
+
+Ikkada, `Car` anedi mundu empty constructor tho create avutundi, aa tarvata manam "setter" method use chesi `Engine` ni inject chestam. Idi car body ni mundu build chesi, aa tarvata mechanic vachi engine ni fit chesinattu.
+
+```java
+@Component
+public class Car {
+    private Engine engine;
+
+    // Engine anedi setter method dwara "inject" avutondi
+    @Autowired
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+}
+```
+
+**Idi eppudu use avtundi?:**
+*   **Optional Dependencies:** Okavela `Engine` anedi optional aite? Maybe adi oka luxury feature. Appudu manam setter injection tho, aa setter ni call cheyakunda undochu, `Car` appatiki create avutundi.
+*   **Flexibility:** Okavela manam tarvata dependency ni marchali anukunte, ee approach lo change cheyochu (kani idi chala rare ga chestam).
+
+**The Catch! ⚠️**
+*   Idi antha safe kadu! Dependency pakka inject avutundi ane guarantee ledu. Evaraina setter method ni call cheyadam marchipothe `engine` anedi `null` ga undipotundi.
+*   Idi "immutability" rule ni break chestundi, adi modern development lo oka best practice.
+
+#### 3. Field Injection (The "Easy Way Out" 🤫)
+
+Idi chala simple ga kanipistundi. Just `@Autowired` ni direct ga field meeda petteyali. `Anthe`, `pani aipoyindhi`!
+
+```java
+@Component
+public class Car {
+    @Autowired
+    private Engine engine;
+    // ... injection kosam constructor or setter avasaram ledu
+}
+```
+
+**Enduku Tempting, Kani Tricky?:**
+*   **Super Concise:** Rayadaniki chala chinna ga, clean ga untundi. `Chala takkuva` code.
+*   **BUT... 💀 (The DANGER ZONE):**
+    *   **Testing ki chala kastam:** Unit tests rasetappudu, ee `engine` field ni manam easy ga set cheyalem. Chala complex reflection વાడాల్సి వస్తుంది, adi pedda no-no.
+    *   **Dependencies ni daachestundi:** Oka class ki em kavalo daani constructor chusi cheppalem. Dependencies anni class lopala daakkuni untayi.
+    *   **Immutability ni violate chestundi:** Setter injection laage, `final` fields vadalemu.
+
+**The Golden Rule 🏆:**
+> Eppudu **Constructor Injection** ne prefer cheyandi. Kevalam optional beans kosam matrame Setter Injection vadandi. Production code lo **Field Injection ni avoid cheyandi**—chudadaniki easy ga unna, tarvata testing lo തലనొప్పులు teppistundi!
+
+**Cliffhanger:**
+Sare, `Car` loki okka `Engine` ni ela pettalo nerchukunnam. Kani okavela mana daggara chala rakala engines unte? `PetrolEngine`, `DieselEngine`, `ElectricEngine` lantiవి? Appudu Spring ki edi inject cheyalo ela telustundi? Katha konchem twist ayyindi! Daanini அடுத்த chapter lo chuddam... 🤫

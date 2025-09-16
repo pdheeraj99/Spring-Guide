@@ -70,4 +70,82 @@ The ApplicationContext hashcode is: 123456789 (some hash code)
 ```
 Chusava! `setBeanName()` and `setApplicationContext()` anevi manam bean ni adagakamunde, container start ayye process lone call ayyayi.
 
-With this, we have fully covered the "Customizing the Nature of a Bean" section. Now, we are truly ready to tackle the next major topic: **Container Extension Points**. Let's start with `BeanFactoryPostProcessor`. Ready aa? 🔥
+---
+<br>
+
+### ✨ The Modern Way: Just Autowire It!
+
+`Aware` interfaces ni implement cheyadam anedi paatha paddati, kani chala cases lo, modern Spring manaki inka simple option istundi: **avasaramaina resource ni direct ga `@Autowired` cheyadam!**
+
+Idi "onboarding" process lantiది kadu, company ne kotha employee ki, andulo unna anni important contacts tho unna phone ni direct ga icchinattu.
+
+**The Classic `Aware` Way (manam chusindi):**
+```java
+public class MyBean implements ApplicationContextAware {
+    private ApplicationContext context;
+
+    @Override
+    public void setApplicationContext(ApplicationContext context) {
+        this.context = context; // Spring deenini manakosam call chestundi
+    }
+}
+```
+
+**The Modern, Cleaner Autowired Way:**
+```java
+@Component
+public class MyModernBean {
+    private final ApplicationContext context;
+
+    // Daanini constructor lo adagandi, anthe!
+    @Autowired
+    public MyModernBean(ApplicationContext context) {
+        this.context = context;
+    }
+
+    public void doSomething() {
+        // Ikkada nuvvu context ni vadukovachu!
+        MyOtherBean other = context.getBean(MyOtherBean.class);
+    }
+}
+```
+**Enduku ee kotha paddati better anipistundi?**
+*   **Consistency:** Anni dependencies ki oke rakamaina pattern (constructor injection) vadutunnav. Special interfaces avasaram ledu.
+*   **Clarity:** Constructor chudagane, "Ee bean ki `ApplicationContext` meeda dependency undi" ani clear ga cheptundi.
+*   **Immutability:** `context` field ni `final` ga cheyochu.
+
+So, `Aware` interfaces ela pani chestayo telusukovadam anedi lifecycle ardam chesukovadaniki chala mukhyam, kani `ApplicationContext` kosam, direct injection eh ippudu clean choice.
+
+### 🦸 Other Aware Superpowers
+
+`ApplicationContextAware` anedi andari kante famous, kani konni specific situations lo use ayye inkonni `Aware` interfaces unnayi. Veetilo konni telisinte, neeku ee mottham pattern ardam ayyindi ani chupistundi.
+
+*   **`BeanNameAware`:**
+    *   **Em istundi:** Container lo bean ki icchina ID or peru (e.g., `"myAwesomeService"`).
+    *   **Eppudu use avtundi:** Logging or tasks create chesetappudu, ఏ bean aa pani start chesindo telusukovadaniki.
+
+*   **`BeanFactoryAware`:**
+    *   **Em istundi:** Bean ni create chesina `BeanFactory`. Idi `ApplicationContext` kanna konchem simpler version.
+
+*   **`EnvironmentAware`:**
+    *   **Em istundi:** Spring `Environment` object, deenitho manam property files (`application.properties`) and environment variables ni chadovachu.
+
+**Mermaid Diagram: Two Paths to the Context**
+```mermaid
+graph TD
+    A(Mana Bean) -- kavali --> C(ApplicationContext);
+
+    subgraph "Daari 1: Classic"
+        A -- implement chestundi --> I(ApplicationContextAware);
+        I -- lo untundi --> M(setApplicationContext());
+        C -- deeniki pass avutundi --> M;
+    end
+
+    subgraph "Daari 2: Modern"
+        A -- lo undi --> CTOR(MyBean(ApplicationContext ctx));
+        C -- deeniki inject avutundi --> CTOR;
+    end
+```
+
+**Cliffhanger:**
+Bean lifecycle lo antha chusesam, creation nunchi awareness, initialization varaku. Kani, manam inka cover cheyani oka ultra-powerful bean undi. Adi, create ayyaka **prati okka vere bean** ni inspect chesi, *modify* kuda cheyagaladu. Adi nee application ki ultimate quality control inspector lantiది. Daanine `BeanPostProcessor` antaru. Ee master-level topic loki next dive cheddam!

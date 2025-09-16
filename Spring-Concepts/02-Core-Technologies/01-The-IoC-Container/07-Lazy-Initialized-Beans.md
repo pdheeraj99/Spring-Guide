@@ -89,4 +89,57 @@ LazyBean created! 😴 (You finally called me!)
 ```
 Chusava mawa! Container start ayinappudu, `EagerBean` matrame create ayyindi. Manam `context.getBean(LazyBean.class)` ani adiginappudu matrame, `LazyBean` create ayyindi.
 
-That's `@Lazy` for you! A simple but powerful tool for performance tuning. Next topic ki ready aa? 💪
+---
+<br>
+
+### 😴 Pro-Tip: Go Full Lazy Mode on a `@Configuration` Class!
+
+Konni sarlu, mana daggara konni beans group ga untayi, avi kevalam oka specific feature kosame vadatam, ಉದಾహరణకు (for example) oka admin dashboard or reporting tool. Aa feature vadithe tappa, aa beans ni load cheyadam anavasaram.
+
+Prati `@Bean` method meeda `@Lazy` pette badulu, manam daanini mottham `@Configuration` class meeda ne pettochu!
+
+Idi party organizer tho, "Ee specific guest list lo unna andariki cheppu, andaru late ga rammani" ani cheppinattu.
+
+```java
+// Ee class lo define chesina anni beans ippudu default ga lazy avutayi!
+@Configuration
+@Lazy
+public class ReportingConfig {
+
+    @Bean
+    public HeavyPdfReportGenerator pdfReportGenerator() {
+        // Ee bean LAZY, endukante config class lazy ga undi
+        return new HeavyPdfReportGenerator();
+    }
+
+    @Bean
+    public HeavyExcelReportGenerator excelReportGenerator() {
+        // Ee bean KUDA LAZY
+        return new HeavyExcelReportGenerator();
+    }
+
+    @Bean
+    @Lazy(false) // Manam override cheyochu!
+    public ReportingStatusChecker statusChecker() {
+        // Ee bean EAGER ga untundi, endukante manam explicit ga cheppam.
+        return new ReportingStatusChecker();
+    }
+}
+```
+
+**The Rule:**
+*   `@Configuration` class meeda unna `@Lazy`, daani lopala unna anni `@Bean` methods ki default avutundi.
+*   Manam eppudaina ee default ni, okko `@Bean` method meeda `@Lazy(true)` or `@Lazy(false)` petti override cheyochu.
+
+**Mermaid Diagram: The Lazy Club**
+```mermaid
+graph TD
+    A["@Configuration @Lazy"] -- Default set chestundi --> B(Anni @Beans Lazy);
+    B -- Kaligi undi --> C(pdfReportGenerator);
+    B -- Kaligi undi --> D(excelReportGenerator);
+    B -- Kani... --> E["@Bean @Lazy(false)"];
+    E -- Default ni override chestundi --> F(statusChecker Eager ga untundi);
+```
+
+**Cliffhanger:**
+Beans ni *ela* and *eppudu* create cheyalo control cheyadam nerchukunnam. Kani manam Spring magic meeda depend ayyam vaatini find chesi inject cheyadaniki. Okavela ee magic confuse aite? Okate type lo rendu beans unte? Appudu Spring edi choose cheskuntundi? Manam "director" ga mari, Spring ki correct ga edi kavalo cheppe time vachindi. Daaniki `Qualifier` and `@Primary` lanti powerful annotations vadatam. Next, autowiring ni fine-tune cheyadam nerchukundam!
