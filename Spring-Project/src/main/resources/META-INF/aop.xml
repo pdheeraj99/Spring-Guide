@@ -1,0 +1,12 @@
+<!DOCTYPE aspectj PUBLIC
+        "-//AspectJ//DTD//EN" "http://www.eclipse.org/aspectj/dtd/aspectj.dtd">
+<aspectj>
+    <weaver>
+        <!-- Weave classes in this package -->
+        <include within="io.mawa.spring.core.ltw.*"/>
+    </weaver>
+    <aspects>
+        <!-- Specify which aspect to use for weaving -->
+        <aspect name="io.mawa.spring.core.ltw.MyAspect"/>
+    </aspects>
+</aspectj>
