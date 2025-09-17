@@ -15,9 +15,9 @@ The **safe navigation operator** (`?.`) ee problem ni solve chestundi.
 
 ```mermaid
 graph TD
-    A["Expression: `user.address?.city`"] --> B{Is user.address null?};
-    B -- "Yes" --> C[Return null <br> (No NPE! ✅)];
-    B -- "No" --> D[Call getCity() on address <br> (Normal execution)];
+    A["Expression: `user.address?.city`"] --> B{"Is user.address null?"};
+    B -- "Yes" --> C["Return null <br> (No NPE! ✅)"];
+    B -- "No" --> D["Call getCity() on address <br> (Normal execution)"];
 ```
 Idi chala elegant way lo null checks ni handle chestundi.
 
