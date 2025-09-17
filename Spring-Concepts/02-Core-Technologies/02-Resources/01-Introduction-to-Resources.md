@@ -52,27 +52,6 @@ Ee universal key ki konni important methods unnayi, as per the documentation:
 
 Ee methods use chesi, manam resource type gurinchi tension padakunda, consistent code rayochu.
 
-### A Quick Example 🧑‍💻
-Let's see how easy it is to use this universal key. Ee code lo, manam Spring `ResourceLoader` ni use chesi, classpath lo unna `my-resource.txt` ni load cheddam.
-
-```java
-// Get a ResourceLoader (we'll learn more about this soon!)
-ResourceLoader resourceLoader = new DefaultResourceLoader();
-
-// Ask the loader for a resource from the classpath
-Resource resource = resourceLoader.getResource("classpath:my-resource.txt");
-
-// Now we can use the universal key's methods!
-System.out.println("Resource exists? " + resource.exists()); // true
-System.out.println("Filename: " + resource.getFilename()); // my-resource.txt
-
-// We can easily get an InputStream to read it
-try (InputStream is = resource.getInputStream()) {
-    // ... read the file content ...
-}
-```
-Chusava, entha simple ga undi! We don't care where the file is; we just ask for it and start using it.
-
 ---
 ### Code Reference: The Universal Key in Action
 The code for this is in the `io.mawa.spring.core.resources.introduction` package.

@@ -10,15 +10,7 @@ Spring chala implementations istundi, kani ee moodu manam 95% of the time vadata
 
 1.  **`UrlResource`**: The Internet Key 🌐. Idi `java.net.URL` ni wrap chestundi. `http://`, `https://`, `ftp://`, or even `file://` lanti standard URL prefixes unna ഏ-resource ni ayina access chestundi.
 2.  **`ClassPathResource`**: The "Inside the Box" Key 📦. Idi mana application classpath nunchi resource ni load chestundi. Ante, mana project `src/main/resources` folder lo or mana dependency `jar` files lo unna files ni access cheyadaniki idi perfect. This is probably the most common one you'll see.
-    ```java
-    // Looks for my-file.txt in src/main/resources
-    Resource resource = new ClassPathResource("my-file.txt");
-    ```
 3.  **`FileSystemResource`**: The "On My Computer" Key 🖥️. Idi mana computer's file system lo ekkado unna file ni direct ga access cheyadaniki. You need to provide the full or relative path to the file.
-    ```java
-    // Looks for pom.xml in the project's root directory
-    Resource resource = new FileSystemResource("pom.xml");
-    ```
 
 **Other Special Keys:**
 -   `ServletContextResource`: Web applications lo `WEB-INF` folder lanti places nunchi resource load cheyadaniki.

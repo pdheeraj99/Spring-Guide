@@ -13,36 +13,55 @@ Ee magic antha `@Value` annotation venaka undi. Manam `String`s and `int`s ni in
 How does it work?
 Spring has a built-in "converter". Nuvvu `@Value("classpath:my-file.txt")` ani oka `String` isthe, Spring automatic ga aa string ni chusi, correct `Resource` implementation (`ClassPathResource`) ni create chesi, neeku inject chestundi. It's that simple!
 
-This is extremely powerful because you can externalize your file paths into a properties file.
-
-**application.properties:**
-```properties
-template.path=classpath:my-resource.txt
-all.xml.files.path=classpath:config/**/*.xml
-```
-
-**Your Java Bean:**
 ```java
 @Component
-public class ResourceDependencyBean {
+public class MyBean {
 
-    // Injects a single resource from the properties file
-    @Value("${template.path}")
-    private Resource template;
+    // Spring converts the String path into a Resource object automatically!
+    @Value("classpath:my-resource.txt")
+    private Resource myTemplate;
 
-    // Injects an array of resources using the wildcard pattern!
-    @Value("${all.xml.files.path}")
-    private Resource[] xmlFiles;
-
-    @PostConstruct
-    public void showInjectedResources() {
-        // You can now use the 'template' and 'xmlFiles' variables
-        System.out.println("Template resource: " + template.getFilename());
-        System.out.println("Found " + xmlFiles.length + " XML files.");
-    }
+    // ...
 }
 ```
-This is the most common and recommended way to work with resources in a Spring application. It's clean, declarative, and highly configurable.
+
+**The Flow:**
+```mermaid
+graph TD
+    subgraph "Your Code"
+        A["@Value(\"classpath:my-file.txt\")<br/>private Resource template;"];
+    end
+
+    subgraph "Spring Container's Brain 🧠"
+        B["Sees String path"];
+        C["Finds correct Resource implementation<br/>(e.g., ClassPathResource)"];
+        D["Creates Resource object"];
+        B --> C --> D;
+    end
+
+    subgraph "Your Bean Instance"
+        E["myBean.template"];
+    end
+
+    D -- "Injects into" --> E;
+```
+
+### Injecting a Whole Bunch of Files!
+Ee magic ikkaditho aagadu. Manam `ResourcePatternResolver` gurinchi nerchukunnam kada? Aa power ni kuda `@Value` tho use cheyochu!
+
+Nuvvu `Resource[]` (an array of Resources) field meeda `@Value` pedithe, Spring automatic ga pattern ni resolve chesi, match ayina anni files ni oka array la inject chestundi.
+
+```java
+@Component
+public class MyBean {
+
+    // Spring finds all matching files and injects them as an array!
+    @Value("classpath:config/**/*.xml")
+    private Resource[] allConfigFiles;
+
+    // ...
+}
+```
 
 This is incredibly useful for loading all configuration files or all templates from a specific directory.
 

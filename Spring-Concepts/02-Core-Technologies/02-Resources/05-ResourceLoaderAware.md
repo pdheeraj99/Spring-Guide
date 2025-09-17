@@ -29,37 +29,23 @@ sequenceDiagram
 As you can see, this happens *before* `@PostConstruct`, so you can use the loader in your init method.
 
 ### `@Autowired` vs. `ResourceLoaderAware`
-Mawa, ee rojullo, code ni Spring tho tightly couple cheyakunda undataniki, manam `@Autowired` eh prefer chestam. The modern way is cleaner and doesn't tie your component to Spring-specific interfaces.
-
-**Modern Way (Recommended):**
+Mawa, ee rojullo, code ni Spring tho tightly couple cheyakunda undataniki, manam `@Autowired` eh prefer chestam.
 ```java
-@Component
-public class MyService {
-    @Autowired
-    private ResourceLoader resourceLoader;
-    // ... use it ...
-}
-```
+// Modern Way
+@Autowired
+private ResourceLoader resourceLoader;
 
-**Classic Way (`ResourceLoaderAware`):**
-```java
-public class MyResourceAwareBean implements ResourceLoaderAware {
-
+// Classic Way
+public class MyBean implements ResourceLoaderAware {
     private ResourceLoader resourceLoader;
 
     @Override
     public void setResourceLoader(ResourceLoader resourceLoader) {
-        System.out.println("setResourceLoader() called. The container gave me its direct number!");
         this.resourceLoader = resourceLoader;
-    }
-
-    public void showResource() {
-        Resource resource = resourceLoader.getResource("classpath:my-resource.txt");
-        System.out.println("Found resource: " + resource.getFilename());
     }
 }
 ```
-Functionally, rendu same result istayi. But it's good to know about `ResourceLoaderAware` because you might see it in older code or some advanced framework integrations.
+Functionally, rendu same result istayi. But `@Autowired` is cleaner and doesn't require you to implement a Spring-specific interface. It's good to know about `ResourceLoaderAware` because you might see it in older code or some advanced framework integrations.
 
 ---
 ### Code Reference: Getting the Direct Line

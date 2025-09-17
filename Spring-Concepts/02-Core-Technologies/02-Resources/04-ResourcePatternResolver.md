@@ -23,25 +23,6 @@ Ee pattern lo manam konni special wildcard characters vadatam:
 2.  **`*`**: Matches zero or more characters within a single path segment (directory or file name). (e.g., `config/*.xml` matches all `.xml` files inside the `config` folder).
 3.  **`**`**: Matches zero or more directories. This is the most powerful one. (e.g., `classpath:/**/service.xml` finds `service.xml` in any subdirectory on the classpath).
 
-### Example in Action 🎬
-Here's how you can use the `PathMatchingResourcePatternResolver` (the default implementation) to find all XML files in any subdirectory under `config`.
-
-```java
-// 1. Create the resolver directly. It's a powerful utility class.
-ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-
-// 2. Use a wildcard pattern to find all matching resources.
-// This pattern means: "look in the classpath for a 'config' folder,
-// then look in any subdirectory '**' for any file ending in '.xml'".
-Resource[] resources = resolver.getResources("classpath:config/**/*.xml");
-
-// 3. Loop through the results
-System.out.println("Found " + resources.length + " files:");
-for (Resource resource : resources) {
-    System.out.println(" - " + resource.getDescription());
-}
-```
-
 ### The `classpath*:` Prefix: The Ultimate Search
 Mawa, idi chala important.
 -   `classpath:my-file.xml`: Classpath lo `my-file.xml` dorikina **first place** nunchi load chestundi. Okavela rendu jar files lo ade file unte, only first di matrame vastundi.
