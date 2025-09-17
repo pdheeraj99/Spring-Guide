@@ -31,11 +31,11 @@ graph TD
 
     subgraph "Evaluation"
         direction LR
-        C --> E{getValue(context)};
-        D[EvaluationContext <br> (contains the 'User' object)] --> E;
+        C --> E{"getValue(context)"};
+        D["EvaluationContext <br> (contains the 'User' object)"] --> E;
     end
 
-    E --> F[Result <br> e.g., "MAWA"];
+    E --> F["Result <br> e.g., 'MAWA'"];
 ```
 
 ### Example in Action 🎬
