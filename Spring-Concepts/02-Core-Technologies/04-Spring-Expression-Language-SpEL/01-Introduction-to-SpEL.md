@@ -26,9 +26,9 @@ SpEL ni manam rendu main ways lo use cheyochu:
 
 ```mermaid
 graph TD
-    A[SpEL Expression <br> `#{'Hello ' + 'World'}`] --> B{How to Use?};
-    B -- "Standalone Tool" --> C[Programmatic API <br> `ExpressionParser parser = ...`];
-    B -- "Inside Spring" --> D[Annotation Integration <br> `@Value(\"...\")`];
+    A["SpEL Expression <br> `#{'Hello ' + 'World'}`"] --> B{"How to Use?"};
+    B -- "Standalone Tool" --> C["Programmatic API <br> `ExpressionParser parser = ...`"];
+    B -- "Inside Spring" --> D["Annotation Integration <br> `@Value(\"...\")`"];
 
     style D fill:#cde4ff,stroke:#004a9e,stroke-width:3px
 ```
