@@ -51,10 +51,10 @@ Ee expression manaki `List<String>` istundi, with only the names of Serbian inve
 
 ```mermaid
 graph TD
-    A[Original List<Inventor>] --> B{Selection <br> `.?[nationality == 'Serbian']`};
-    B --> C[Filtered List<Inventor>];
-    C --> D{Projection <br> `.![name]`};
-    D --> E[Final List<String> <br> (Just the names)];
+    A["Original List<Inventor>"] --> B{"Selection <br> `.?[nationality == 'Serbian']`"};
+    B --> C["Filtered List<Inventor>"];
+    C --> D{"Projection <br> `.![name]`"};
+    D --> E["Final List<String> <br> (Just the names)"];
 ```
 
 This is a feature that many experienced developers don't even know about. Mastering this will make your code cleaner and more expressive.
