@@ -3,6 +3,10 @@ package io.mawa.spring.aop.introductions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import io.mawa.spring.aop.introductions.aspect.UsageTrackingAspect;
+import io.mawa.spring.aop.introductions.model.DefaultUsageTracked;
+import io.mawa.spring.aop.introductions.model.UsageTrackable;
+import io.mawa.spring.aop.introductions.service.ReportGeneratorService;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
