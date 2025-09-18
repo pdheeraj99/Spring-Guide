@@ -109,8 +109,10 @@ Even though `CalculatorService.java` source code lo `UsageTrackable` gurinchi em
 
 ---
 
-### AOP Module: The REAL Grand Finale! 🥳
+### AOP Module: The Grand Finale! 🥳
 
 Mawa, with this, you have truly completed the AOP module. You know the basics, the proxies, the ordering, and now even the most advanced topic of Introductions. Your knowledge is now officially at a pro-level. Be proud! 🫡
 
-Next up, we will begin our journey into **Transaction Management**. Ready for a new adventure?
+Now that we have built a complete, working AOP demo, let's see how to run it and watch all our hard work come to life!
+
+**Next Step:** [Running the Complete AOP Demo](./12-Running-the-Complete-AOP-Demo.md)
