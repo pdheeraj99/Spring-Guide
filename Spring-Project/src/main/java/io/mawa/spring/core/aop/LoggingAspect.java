@@ -15,10 +15,12 @@ import org.springframework.stereotype.Component;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Order(30) // Runs after SecurityAspect (@Order(10)) and AnalyticsAspect (@Order(20))
 public class LoggingAspect {
 
     @Pointcut("execution(* io.mawa.spring.core.aop.service.*.*(..))")

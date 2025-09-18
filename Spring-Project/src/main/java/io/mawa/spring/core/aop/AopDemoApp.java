@@ -1,6 +1,6 @@
 package io.mawa.spring.core.aop;
 
-import io.mawa.spring.core.aop.service.CalculatorService;
+import io.mawa.spring.core.aop.service.Calculator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -11,8 +11,8 @@ public class AopDemoApp {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(AopDemoApp.class, args);
 
-        // Get the CalculatorService bean from the Spring container
-        CalculatorService calculator = context.getBean(CalculatorService.class);
+        // Get the Calculator bean from the Spring container (requesting the interface)
+        Calculator calculator = context.getBean(Calculator.class);
 
         System.out.println("\n--- Calling successful methods ---");
         calculator.add(10, 5);
