@@ -25,36 +25,40 @@ Command run chesina tarvata, Spring Boot start ayyi, chala log messages vastayi.
 ```text
 --- Running Standard AOP Demo (Calculator) ---
 
---- Calling successful methods ---
+--- Calling methods on 'calculatorService' ---
+This should use one instance of the stateful aspect.
 ======> 👮‍♂️ @Order(10) Performing SECURITY CHECK!
 ======> 📈 @Order(20) Gathering ANALYTICS!
 🔥 @Around: Starting timer for CalculatorService.add(..)
 ✅ @Before: Calling method: CalculatorService.add(..)
+======> 📊 [Stateful] Analytics! [Instance: 1139817507, Count: 1]
 Executing: CalculatorService.add()
 ✅ @AfterReturning: Method 'CalculatorService.add(..)' returned: 15
 ✅ @After: Finished executing method: CalculatorService.add(..)
-🔥 @Around: Method CalculatorService.add(..) took 4 ms to complete.
-... (similar output for subtract and multiply) ...
+🔥 @Around: Method CalculatorService.add(..) took 8 ms to complete.
+======> 👮‍♂️ @Order(10) Performing SECURITY CHECK!
+...
+======> 📊 [Stateful] Analytics! [Instance: 1139817507, Count: 2]
+...
+
+--- Calling methods on 'secondCalculatorService' ---
+This should use a DIFFERENT instance of the stateful aspect.
+...
+======> 📊 [Stateful] Analytics! [Instance: 1689169705, Count: 1]
+...
 
 --- Calling method that throws an exception ---
-======> 👮‍♂️ @Order(10) Performing SECURITY CHECK!
-======> 📈 @Order(20) Gathering ANALYTICS!
-🔥 @Around: Starting timer for CalculatorService.divide(..)
-✅ @Before: Calling method: CalculatorService.divide(..)
-Executing: CalculatorService.divide()
-❌ @AfterThrowing: Exception in method 'CalculatorService.divide(..)'. Exception is: java.lang.IllegalArgumentException: Cannot divide by zero!
-✅ @After: Finished executing method: CalculatorService.divide(..)
-🔥 @Around: Exception caught in CalculatorService.divide(..)! Rethrowing...
+...
+======> 📊 [Stateful] Analytics! [Instance: 1139817507, Count: 3]
+...
 --> DemoApp: Caught exception: Cannot divide by zero!
 
 --- Running AOP Introductions Demo (ReportGeneratorService) ---
 Got bean: io.mawa.spring.aop.introductions.service.ReportGeneratorService$$SpringCGLIB$$0
 [UsageTrackingAspect]: Intercepted method call. Incrementing usage count.
-... Generating report: 'Quarterly Financials' ...
-... Report generated successfully.
+...
 [UsageTrackingAspect]: Intercepted method call. Incrementing usage count.
-... Generating report: 'Annual Performance Review' ...
-... Report generated successfully.
+...
 Successfully cast ReportGeneratorService to UsageTrackable.
 Final usage count: 2
 ✅ Verification successful: Usage count is correct.
@@ -66,18 +70,16 @@ Final usage count: 2
 
 1.  **Standard AOP Demo:**
     *   `@Order` correctness: Meeru chuste, `SecurityAspect` (`@Order(10)`) anedi `AnalyticsAspect` (`@Order(20)`) kanna mundu run avuthundi. This proves our ordering is working perfectly!
-    *   **All Advice Types:**
-        *   `@Around` (timer) start avuthundi.
-        *   `@Before` call avuthundi.
-        *   Actual method (`Executing...`) run avuthundi.
-        *   `@AfterReturning` (for success cases) or `@AfterThrowing` (for the divide-by-zero case) trigger avuthundi.
-        *   `@After` (finally block) eppudu run avuthundi.
-        *   `@Around` (timer) end avuthundi.
+    *   **All Advice Types:** The log clearly shows the execution order: `@Around` (start), `@Before`, actual method, `@AfterReturning` (or `@AfterThrowing`), `@After` (finally), `@Around` (end).
     *   Ee flow antha manam nerchukunna advice types ni and వాటి execution order ni live lo chupistundi.
 
-2.  **AOP Introductions Demo:**
+2.  **Stateful Aspect (`perthis`) Demo:**
+    *   Notice the `[Stateful] Analytics!` log. The instance hash code for `calculatorService` is always the same (`1139817507`), and its counter goes from 1 to 3.
+    *   But for `secondCalculatorService`, a **new instance** (`1689169705`) is used, with its own counter. This is the proof that our `perthis` instantiation model is working!
+
+3.  **AOP Introductions Demo:**
     *   Manam `ReportGeneratorService` bean ni get cheskunnam.
-    *   `generateReport()` call chesinappudu, `UsageTrackingAspect` lo unna `@Before` advice trigger ayyi, usage count ni increment chestundi. Adi manam log lo chudochu.
+    *   `generateReport()` call chesinappudu, `UsageTrackingAspect` lo unna `@Before` advice trigger ayyi, usage count ni increment chestundi.
     *   Most importantly, manam `ReportGeneratorService` ni `UsageTrackable` interface ki successfully cast cheyagaligam. Idi `@DeclareParents` యొక్క అసలైన magic!
     *   Final ga, usage count `2` ani verify chesam, which is correct.
 
@@ -85,4 +87,6 @@ Final usage count: 2
 
 Mawa, congratulations! 🥳 Manam AOP ane oka powerful Spring concept ni zero nundi complete understanding varaku vacham. Manam concepts nerchukovadam matrame kadu, vatini real-time lo prove cheyadaniki code kuda rasam. Ee knowledge meeku interviews lo and real-world projects lo chala help avuthundi.
 
-Keep this fire alive! 🔥 Next, we will conquer another important Spring topic. See you in the next lesson! 🚀
+Keep this fire alive! 🔥 Next, we will cover the last piece of AOP theory.
+
+**Next Step:** [Aspect Instantiation Models](./13-Aspect-Instantiation-Models.md)

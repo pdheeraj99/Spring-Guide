@@ -4,6 +4,7 @@ import io.mawa.spring.core.aop.service.Calculator;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
@@ -13,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AopIntegrationTest {
 
     @Autowired
+    @Qualifier("calculatorService")
     private Calculator calculator; // Autowire the interface, not the implementation
 
     @Autowired

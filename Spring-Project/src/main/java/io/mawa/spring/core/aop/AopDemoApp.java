@@ -26,17 +26,22 @@ public class AopDemoApp {
     }
 
     private static void runCalculatorDemo(ConfigurableApplicationContext context) {
-        // Get the Calculator bean from the Spring container (requesting the interface)
-        Calculator calculator = context.getBean(Calculator.class);
+        // Get both Calculator beans from the Spring container using their qualifiers
+        Calculator calculator1 = (Calculator) context.getBean("calculatorService");
+        Calculator calculator2 = (Calculator) context.getBean("secondCalculatorService");
 
-        System.out.println("\n--- Calling successful methods ---");
-        calculator.add(10, 5);
-        calculator.subtract(10, 5);
-        calculator.multiply(10, 5);
+        System.out.println("\n--- Calling methods on 'calculatorService' ---");
+        System.out.println("This should use one instance of the stateful aspect.");
+        calculator1.add(10, 5);
+        calculator1.subtract(10, 5);
+
+        System.out.println("\n--- Calling methods on 'secondCalculatorService' ---");
+        System.out.println("This should use a DIFFERENT instance of the stateful aspect.");
+        calculator2.multiply(10, 5);
 
         System.out.println("\n--- Calling method that throws an exception ---");
         try {
-            calculator.divide(10, 0);
+            calculator1.divide(10, 0);
         } catch (Exception e) {
             System.out.println("--> DemoApp: Caught exception: " + e.getMessage());
         }
