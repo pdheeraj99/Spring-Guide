@@ -28,6 +28,15 @@ public class AopDemoApp {
 
         System.out.println("\n--- Finished ---");
 
+        // --- AOP Introductions Demo ---
+        System.out.println("\n--- Testing AOP Introductions ---");
+        // Now, we can cast our Calculator bean to the new interface!
+        UsageTrackable tracker = (UsageTrackable) calculator;
+        tracker.trackUsage();
+        tracker.trackUsage();
+        System.out.println("Final usage count from tracker: " + tracker.getUsageCount());
+
+
         // Close the context
         context.close();
     }
