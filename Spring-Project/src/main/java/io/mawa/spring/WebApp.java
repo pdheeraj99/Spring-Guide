@@ -13,7 +13,8 @@ import java.util.Arrays;
     "io.mawa.spring.core.scopes.request",
     "io.mawa.spring.core.scopes.session",
     "io.mawa.spring.core.scopes.application",
-    "io.mawa.spring.realworld"
+    "io.mawa.spring.realworld",
+    "io.mawa.spring.core.aop" // Scanning our new AOP examples
 })
 public class WebApp {
 
