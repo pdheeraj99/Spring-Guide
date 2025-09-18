@@ -1,19 +1,15 @@
 package io.mawa.spring.core.aop;
 
-import io.mawa.spring.core.aop.service.CalculatorService;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
 import io.mawa.spring.core.aop.service.Calculator;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest(properties = "spring.aop.proxy-target-class=false")
 public class AopIntegrationTest {
 
     @Autowired
@@ -31,7 +27,7 @@ public class AopIntegrationTest {
 
         // Assert that the class is a JDK Dynamic proxy
         assertThat(calculator.getClass().getName()).contains("$Proxy");
-        assertThat(org.springframework.aop.framework.AopUtils.isJdkDynamicProxy(calculator)).isTrue();
+        assertThat(AopUtils.isJdkDynamicProxy(calculator)).isTrue();
 
         System.out.println("\n--- Calling add() from within test ---");
         calculator.add(20, 20);
