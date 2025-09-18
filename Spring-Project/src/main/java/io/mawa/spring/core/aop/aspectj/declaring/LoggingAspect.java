@@ -1,6 +1,11 @@
 package io.mawa.spring.core.aop.aspectj.declaring;
 
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 /**
@@ -58,4 +63,45 @@ public class LoggingAspect {
     // We have not yet defined the "WHAT" (the Advice). That's coming next!
     // When we run the app now, nothing will be "intercepted" yet. The purpose is to
     // ensure Spring can parse these pointcut definitions without errors.
+
+    // --- Advice Definitions ---
+
+    @Before("forBusinessServiceGetData()")
+    public void beforeGetDataAdvice() {
+        System.out.println("✅ ADVICE EXECUTED: @Before - Trying to get data...");
+    }
+
+    @AfterReturning(
+        pointcut = "forBusinessServiceGetData()",
+        returning = "result"
+    )
+    public void afterReturningDataAdvice(Object result) {
+        System.out.println("✅ ADVICE EXECUTED: @AfterReturning - Method returned with value: " + result);
+    }
+
+    @AfterThrowing(
+        pointcut = "execution(* io.mawa.spring.core.aop.aspectj.pointcuts.BusinessService.causeException(..))",
+        throwing = "ex"
+    )
+    public void afterThrowingExceptionAdvice(Throwable ex) {
+        System.out.println("✅ ADVICE EXECUTED: @AfterThrowing - Method threw an exception: " + ex.getMessage());
+    }
+
+    @Around("forLoggableMethods()")
+    public Object aroundAdvice(ProceedingJoinPoint pjp) throws Throwable {
+        System.out.println("✅ ADVICE EXECUTED: @Around - Before method execution: " + pjp.getSignature().toShortString());
+
+        long startTime = System.nanoTime();
+
+        Object result;
+        try {
+            result = pjp.proceed(); // <-- Target method ni ikkada call chestunnam
+        } finally {
+            long endTime = System.nanoTime();
+            long duration = endTime - startTime;
+            System.out.println("✅ ADVICE EXECUTED: @Around - After method execution. Duration: " + duration / 1_000_000 + "ms");
+        }
+
+        return result;
+    }
 }

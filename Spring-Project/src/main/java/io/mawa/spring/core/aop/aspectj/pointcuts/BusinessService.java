@@ -55,4 +55,9 @@ public class BusinessService {
         // if they are made from within the same object (a self-invocation).
         return data.length();
     }
+
+    public void causeException() {
+        System.out.println(">> Inside BusinessService.causeException()");
+        throw new RuntimeException("This is a simulated business exception!");
+    }
 }
