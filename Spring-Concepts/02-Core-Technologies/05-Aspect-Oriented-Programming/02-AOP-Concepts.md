@@ -1,99 +1,63 @@
-# AOP Concepts: Mana Secret Language! 🤫
+# 📜 2. AOP Concepts (AOP Terminology)
 
-Mawa, last time manam AOP ante ento high-level lo chusam. Ippudu, AOP prapancham lo manam vaade konni important "secret words" (terminology) nerchukundam. Ee padalu oste, AOP antha clear aipoddi. Ready aa? Let's decode this! 🕵️‍♂️
+Mawa, last time AOP enduko chusam. Ippudu AOP prapancham lo manam vaade konni important "secret words" (terminology) nerchukundam. Choodu, idi careful ga chepta vinu, ee padalu oste AOP antha clear aipoddi.
 
-### Source URL
-[https://docs.spring.io/spring-framework/reference/core/aop/introduction-defn.html](https://docs.spring.io/spring-framework/reference/core/aop/introduction-defn.html)
+### AOP Key Terms
 
-### The AOP Vocabulary 📖
+1.  **Aspect**
+    *   **Deeni pani enti ante:** cross-cutting concern logic ni oka chota pettadam. Idi oka simple class, daantlo manam advice, pointcuts lanti AOP constructs define chestam. Simple ga, manam raase logging or security logic antha ee class lone untundi.
+    *   **Spring lo:** `@Aspect` annotation tho mark chesina class.
 
-Imagine manam oka restaurant ki vellam.
--   **You (The Customer):** You are the one who wants to perform an action (eat food).
--   **`Chef` (The Target Object):** The main person who does the core work (cooks the food).
--   **`Waiter` (The AOP Proxy):** The person who takes your order, talks to the chef, and brings you the food. He adds extra services around the chef's work.
--   **`Manager` (The Aspect):** The person who defines extra services like "logging every order" or "sanitizing hands before cooking". He is the cross-cutting concern.
+2.  **Join Point**
+    *   **Deeni pani enti ante:** program execution lo oka specific point ni represent cheyadam. For example, oka method call cheyadam, or oka exception handle cheyadam. Ee points daggara manam AOP logic ni insert cheyochu.
+    *   **Spring AOP lo:** Chala important, mawa. Spring AOP lo, join point ante **ALWAYS a method execution**. Verevi (like constructor or field access) Spring AOP support cheyadu.
 
-Ee analogy tho, let's learn the real terms:
+3.  **Advice**
+    *   **Deeni pani enti ante:** Aspect, oka particular join point daggara chese asal action (pani). Ante, manam raase cross-cutting logic eh ee advice.
+    *   **Types of Advice:** Manaki 5 rakala advices unnayi, situation batti correct di vadali.
+        *   `Before`: Target method call avvaka mundu ee logic execute avtundi.
+        *   `After Returning`: Target method success ga complete ayi, result return chesaka ee logic execute avtundi.
+        *   `After Throwing`: Target method lo edo exception vasthe, appudu ee logic execute avtundi.
+        *   `After (Finally)`: Method success ayina, fail ayina, result tho sambandham lekunda, finally block laaga execute avtundi.
+        *   `Around`: Idi chala powerful. Target method ki mundu, tarvata, full control teskuntundi. Manam ee advice nunchi target method ni call cheyochu, skip cheyochu, arguments marchochu, or return value ni kuda marchochu.
 
-```mermaid
-graph TD
-    subgraph "AOP World 🌍"
-        Target(Target Object - Chef 👨‍🍳)
-        Proxy(AOP Proxy - Waiter 🤵)
-        Aspect(Aspect - Manager 🧑‍💼)
+4.  **Pointcut**
+    *   **Deeni pani enti ante:** Join points ni match cheyadam. Idi oka expression, or rule anuko. Ee rule, "Ee advice ni ekkada (at which join points) apply cheyali?" ani cheptundi.
+    *   **Example:** "ee package lo unna anni `Service` classes lo `get*` tho start ayye methods ki matrame ee advice apply cheyi".
 
-        Proxy -- wraps --> Target
-        Aspect -- defines rules for --> Proxy
-    end
-```
+5.  **Target Object**
+    *   **Deeni pani enti ante:** Idi asal business object (bean), deeni meeda manam AOP logic (advice) apply chestunnam. AOP framework ee object ni proxy chestundi.
 
-1.  **Aspect (The Manager 🧑‍💼):**
-    *   **What it is:** Idi oka class, andulo manam cross-cutting concern logic (like logging, security) ni define chestam.
-    *   **Analogy:** The Manager who decides, "Prati order ki bill generate cheyali" or "Prati customer ki welcome drink ivvali".
-    *   **In Spring:** Usually a class annotated with `@Aspect`.
+6.  **AOP Proxy**
+    *   **Deeni pani enti ante:** Target object ni wrap chesi, AOP logic ni add cheyadam. Spring container, target object ki బదులుగా ee proxy object ni create chestundi. Client call chesinappudu, ee proxy call ni intercept chesi, advice ni execute chesi, tarvata asal target object method ni call chestundi.
+    *   **Types:** Spring lo rendu rakalu: JDK Dynamic Proxy and CGLIB Proxy.
 
-2.  **Join Point (A Moment in Time 🕒):**
-    *   **What it is:** Program lo oka specific point, for example, a method call.
-    *   **Analogy:** The moment the `Chef` starts cooking, or the moment he finishes. Ee specific moments ne join points antam.
-    *   **In Spring AOP:** Spring lo, a join point is **ALWAYS** a method execution. Gurthu pettuko, mawa!
+7.  **Weaving**
+    *   **Deeni pani enti ante:** Aspect ni target object tho link chesi, AOP proxy ni create chese process.
+    *   **Spring lo:** Ee process antha **runtime** lo jarugutundi, ante application run ayyetappudu.
 
-3.  **Advice (The Action 🎬):**
-    *   **What it is:** The actual code/action that an aspect performs at a join point.
-    *   **Analogy:** The Manager's actual instruction: "Log the order details to the system" (the action).
-    *   **Types of Advice:** Manaki 5 rakala advices unnayi:
-        *   **`Before`:** Method start avvakamunde run avtundi. (Chef vanta start cheyakamunde, hands wash chesko anadam).
-        *   **`After Returning`:** Method successfully complete ayyaka run avtundi. (Chef vanta chesesaka, dish meeda garnish cheyadam).
-        *   **`After Throwing`:** Method lo exception vasthe run avtundi. (Vanta chesetappudu edo padeste, kitchen clean cheyadam).
-        *   **`After (Finally)`:** Method ela complete ayina (success or failure), run avtundi. (Chef shift aipoyaka, kitchen lights off cheyadam).
-        *   **`Around`:** The most powerful one! Method ki mundu, tarvata kuda run avtundi. It can even decide not to call the method at all! (Manager vachi, "Ee dish vaddu, vere cheyi" ani cheppagalaru).
-
-4.  **Pointcut (The "Where" Rule 🗺️):**
-    *   **What it is:** Idi oka rule or expression that tells the advice **where** to run. It matches join points.
-    *   **Analogy:** The Manager's rule: "Apply the 'billing' advice only for methods in the `CafeService` that start with `placeOrder`". Ee rule eh pointcut.
-    *   **In Spring:** We use the AspectJ pointcut expression language to write these rules.
-
-5.  **Target Object (The Hero 🦸‍♂️):**
-    *   **What it is:** The actual bean/object whose methods we want to add advice to.
-    *   **Analogy:** Mana `Chef`! The person doing the main work.
-
-6.  **AOP Proxy (The Helper 🤵):**
-    *   **What it is:** Spring create chese oka special object. Idi mana `Target Object` ni wrap chestundi. When we call a method on the proxy, it applies the advice and then calls the original method on the target.
-    *   **Analogy:** Mana `Waiter`. Nuvvu direct ga chef tho matladavu, waiter tho matladatav. Waiter velli chef ki order cheppi, extra services (like getting water) chesi, food techi istadu.
-    *   **In Spring:** This is either a JDK dynamic proxy or a CGLIB proxy.
-
-7.  **Weaving (The Magic Stitching 🧵):**
-    *   **What it is:** The process of linking the `Aspect` with the `Target Object` to create the final `AOP Proxy`.
-    *   **Analogy:** The process of the Manager explaining the rules to the Waiter, so the Waiter can apply them when dealing with the Chef.
-    *   **In Spring:** Spring does this at **runtime**.
-
-Here's the complete flow in a diagram:
+### Simple Flow Diagram
 
 ```mermaid
 sequenceDiagram
     participant C as Client
-    participant P as AOP Proxy (Waiter)
-    participant A as Aspect (Manager's Rules)
-    participant T as Target Object (Chef)
+    participant P as AOP Proxy
+    participant A as Aspect (Advice Logic)
+    participant T as Target Object
 
-    C->>P: placeOrder()
-    P->>A: Any 'Before' advice for this?
-    A-->>P: Yes, log the request.
-    P->>T: placeOrder()
-    T-->>P: Order placed successfully (return value)
-    P->>A: Any 'After Returning' advice?
-    A-->>P: Yes, log the success.
-    P-->>C: Return the result.
+    C->>P: methodCall()
+    P->>A: Before Advice execute cheyi
+    A-->>P: Done
+    P->>T: asal methodCall()
+    T-->>P: Result
+    P->>A: After Returning Advice execute cheyi
+    A-->>P: Done
+    P-->>C: Final Result
 ```
 
-### Mawa's Pro Tip 💡
-Docs lo cheppinattu, "use the least powerful advice type that can implement the required behavior". Ante, `After Returning` tho pani aipothe, `Around` advice vadoddu. Endukante, `Around` advice lo manam `proceed()` call cheyadam marchipothe, asalaina method call avvadu! Less power = less risk.
+### Pro Tip 💡
+Docs lo cheppinattu, "use the least powerful advice type that can implement the required behavior". Ante, `After Returning` tho pani aipothe, `Around` advice vadoddu. Endukante, `Around` advice lo `proceed()` call cheyadam marchipothe, asalaina method call avvadu! **Less power = less risk.**
 
-### How to Run This Section's Code
-Ee section lo manam just concepts nerchukunnam and future examples kosam code structure set chesam. Ee code ni run chesi, setup correct ga undo ledo chuskovachu.
-Project root `Spring-Project` folder lo undi, ee command run cheyi:
-```bash
-mvn compile exec:java -Dexec.mainClass="io.mawa.spring.core.aop.concepts.AopConceptsDemoApp"
-```
-
-### Mawa's Cliffhanger 🧗
-Okay, ee secret language nerchukunnam. Kani Spring ki AOP gurinchi em telusu? Asalu Spring AOP enduku antha special? What are its goals and limitations? Next topic lo, manam Spring AOP capabilities ni explore cheddam. Let's see what our superpower can and cannot do! 💥
+---
+### Mawa's Next Step
+Okay, ee AOP terminology antha set. But asalu Spring AOP enduku, daani capabilities enti? Next, adi entha powerful oo chuddam.

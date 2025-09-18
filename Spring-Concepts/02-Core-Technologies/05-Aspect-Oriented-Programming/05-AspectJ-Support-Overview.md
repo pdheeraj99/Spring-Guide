@@ -1,58 +1,46 @@
-# @AspectJ Support: The Modern Way to AOP! 🚀
+# 📜 5. @AspectJ Support Overview
 
-Mawa, manam ippudu AOP lo asalaina magic loki enter avuthunnam. Ippati varaku theory chusam, ippudu practicals start! `@AspectJ` anedi AOP ni implement cheyadaniki modern, annotation-based, and most popular way. Idi chala clean ga, easy ga untundi. Let's get our hands dirty! 💻
+Mawa, ippudu manam AOP ni asal code lo ela rayalo chuddam. Ippati varaku theory chusam, ippudu practicals start! Spring lo AOP rayadaniki the most popular and modern way enti ante, `@AspectJ` annotations use cheyadam.
 
-### Source URL
-[https://docs.spring.io/spring-framework/reference/core/aop/ataspectj.html](https://docs.spring.io/spring-framework/reference/core/aop/ataspectj.html)
+### @AspectJ Style ante enti?
 
-### What is @AspectJ Style? 🤔
+Chala simple mawa. Idi AOP logic ni rayadaniki oka "style" anuko.
+*   **Regular Java Classes:** Manam AOP logic antha normal Java classes (POJOs) lone rastam.
+*   **Annotations:** Manam `@Aspect`, `@Pointcut`, `@Before` lanti special annotations tho aa class ki AOP powers istam.
 
-Simple ga cheppali ante, idi oka "style" of writing aspects.
-*   **Regular Java Classes:** Manam normal Java classes eh rastam. No special files, no XML (mostly).
-*   **Annotations:** Manam `@Aspect`, `@Before`, `@After`, etc., lanti annotations tho mana class ki AOP powers istam.
-*   **Inspired by AspectJ:** Ee style ni first [AspectJ](https://www.eclipse.org/aspectj/) project introduce chesindi. Spring aa style ni adopt cheskundi.
+### The Spring AOP & AspectJ Relationship
 
-### Spring AOP + AspectJ = The Perfect Match ❤️
+Mawa, ikkada chala mandi confuse avtaru. "Manam @AspectJ annotations vadutunnam ante, full AspectJ framework ni vadutunnama?" ani. The answer is **NO**. Choodu, careful ga chepta vinu.
 
-Mawa, ikkada oka important point undi. Manam `@AspectJ` annotations vadutunnam ante, manam full AspectJ framework vadutunnam ani kaadu.
-*   **Spring uses AspectJ's library:** Spring, AspectJ create chesina oka library ni matrame vadukuntundi. Enduku? To understand the pointcut expressions (aa "where" rules manam last time chusinaవి).
-*   **Runtime is Pure Spring AOP:** But the actual AOP magic (creating proxies, weaving) antha Spring AOP ye chuskuntundi.
-*   **No Special Compiler Needed:** Anduke, manaki AspectJ compiler or weaver lanti special tools em avasaram ledu. Mana normal Java code, normal JVM, anthe! 😎
-
-> **In short:** Spring took the best part of AspectJ (the easy annotation style and powerful pointcut language) and integrated it into its own, simpler, proxy-based AOP framework.
+*   **What Spring Uses:** Spring, **AspectJ create chesina oka library ni matrame** vadukuntundi. Deeni pani enti ante, manam rase `@Pointcut` expressions ni parse chesi, ardam cheskovadam. AspectJ pointcut language chala powerful, so Spring daaniకోసం ee library ni use chestundi.
+*   **What Spring Does:** But, asal AOP magic, ante proxy objects ni create cheyadam, advice ni weave cheyadam... ee panulantha **pure Spring AOP framework** eh chuskuntundi.
+*   **The Result:** Manaki AspectJ lanti powerful pointcuts rayagalige sakti vastundi, kani AspectJ laaga special compiler or weaver lanti extra tools avasaram ledu. It's the best of both worlds!
 
 ```mermaid
 graph TD
     subgraph "Your Project"
-        A["Your Java Code (@Aspect, @Before, etc.)"]
+        A["Your Java Code with @AspectJ Annotations"]
     end
 
-    subgraph "Spring Framework"
+    subgraph "Spring Framework's AOP Engine"
         B["Spring's Proxy-Based AOP Runtime"]
         C["AspectJ's Pointcut Parsing Library"]
-        B -- uses --> C
+        B -- "uses to understand pointcuts" --> C
     end
 
-    A -- is understood by --> B
+    A -- "is processed by" --> B
 ```
 
 ### What's Coming Up in this Chapter?
 
-Ee `@AspectJ` journey lo, manam ee topics cover cheyabothunnam:
-1.  **Enabling @AspectJ Support:** Asalu Spring ki, "Hey, nenu @AspectJ annotations vadutunna, chusko!" ani ela cheppali?
+Ee `@AspectJ` journey lo, manam ee topics ni step-by-step ga cover cheyabothunnam:
+1.  **Enabling @AspectJ Support:** Asal AOP ni activate cheyadaniki aa "switch" enti?
 2.  **Declaring an Aspect:** Oka normal class ni `@Aspect` tho oka powerful aspect ga ela marchali?
 3.  **Declaring a Pointcut:** Mana "where" rules (`@Pointcut`) ni ela rayali?
 4.  **Declaring Advice:** Mana "what" and "when" logic (`@Before`, `@After`, `@Around`, etc.) ni ela implement cheyali?
-5.  **Introductions:** Existing classes ki kottha methods ni on-the-fly ela add cheyali?
-6.  **Aspect Instantiation Models:** Mana Aspect object ni Spring ela create chestundi? (Singleton aa, prototype aa?)
-7.  **A Full AOP Example:** Anni concepts ni kalipi, ఒక complete example chuddam.
+5.  **Introductions:** Existing classes ki kottha methods ni on-the-fly ela add cheyali? (oka cool feature!)
+6.  **A Full AOP Example:** Anni concepts ni kalipi, ఒక complete, working example chuddam.
 
-### How to Run This Section's Code
-Ee section lo manam just concepts nerchukunnam and future examples kosam code structure set chesam. Ee code ni run chesi, setup correct ga undo ledo chuskovachu.
-Project root `Spring-Project` folder lo undi, ee command run cheyi:
-```bash
-mvn compile exec:java -Dexec.mainClass="io.mawa.spring.core.aop.aspectj.AspectJSupportDemoApp"
-```
-
-### Mawa's Cliffhanger 🧗
-Okay, theory antha set. But how do we flip the switch? How do we tell our Spring application, "It's time for AOP!"? There's one magic annotation that brings everything to life. Ready to discover it? Let's move to our very first step: Enabling @AspectJ Support! 🚀
+---
+### Mawa's Next Step
+Okay, theory antha set. But how do we flip that switch? How do we tell our Spring application, "It's time for AOP!"? There's one magic annotation that brings everything to life. Ready to discover it? Let's move to our very first step: Enabling @AspectJ Support! 🚀

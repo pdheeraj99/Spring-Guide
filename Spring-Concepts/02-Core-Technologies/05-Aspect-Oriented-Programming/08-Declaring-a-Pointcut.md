@@ -1,116 +1,75 @@
-# 🎯 8. Declaring a Pointcut (Where to Intervene?)
+# 📜 8. Declaring a Pointcut
 
-Hey Mawa! Last time, we hired our "Director" (the `@Aspect`). Now, we need to give them a "Shooting Schedule". A director doesn't just film everything, right? They film specific scenes at specific locations. A **Pointcut** is exactly that – it's our detailed shooting schedule. It tells our Aspect *exactly where* to apply its logic.
+Mawa, manam aspect create chesam. Ippudu aa aspect ni ekkada apply cheyalo cheppali. Danike **Pointcut** vadatam. Choodu, pointcut anedi oka simple rule. Deeni pani enti ante, "ee advice ni ekkada (at which join points) apply cheyali?" ani cheppadam.
 
-A Pointcut is a powerful expression that matches specific "join points" (in Spring, this means specific method executions).
+### How to Define a Pointcut
 
-#### How to Define a Pointcut?
-
-You define a pointcut with a `@Pointcut` annotation on a method inside your `@Aspect` class. This method itself is the "signature" of the pointcut.
-
-*   **The Method Signature:** It must have a `void` return type. Its name is the name of the pointcut. It's just a placeholder; the method body is always empty.
-*   **The `@Pointcut` Annotation:** This holds the powerful expression that does the actual matching.
+`@Pointcut` annotation ni oka empty method meeda pettu. Aa method name eh pointcut peru. Manam tarvata ee peru ni mana advice lo use cheskuntam.
 
 ```java
 @Aspect
 @Component
 public class LoggingAspect {
 
-    // This is a pointcut signature
-    @Pointcut("execution(* io.mawa.spring.core.aop.aspectj.pointcuts.BusinessService.getData(..))")
-    public void forGetData() {} // The method body is empty
+    // Choodu, ikkada forServicePackage() anedi oka pointcut.
+    // Daaniki unna expression, "execution(...)" anedi asal rule.
+    @Pointcut("execution(* com.example.service.*.*(..))")
+    public void forServicePackage() {} // Deeni body eppudu empty ga untundi.
 
-    // We will later use this named pointcut "forGetData()" in our advice.
+    // Ee forServicePackage() ni manam @Before("forServicePackage()") lanti advice lo vadukuntam.
 }
 ```
 
----
+### Pointcut Designators (PCDs)
 
-### The Pointcut Designators (The "Language" of the Shooting Schedule)
+Eevi pointcut expressions lo vaade main keywords. Chala unnayi, kani ivi most important.
 
-These are the special keywords you use in your pointcut expressions. Spring AOP supports the most useful ones from AspectJ.
+1.  `execution` **(The Superstar 🌟)**
+    *   Idi chala powerful and most commonly used. Method signature ni full ga match chestundi.
+    *   **Syntax:** `execution(modifiers? return-type package.class.method(params) throws?)`
+    *   **Wildcards:**
+        *   `*`: `*` anedi దేనికైనా match avtundi (e.g., `*` return type, `*Service` class name).
+        *   `..`: `(..)` anedi zero or more parameters ki match avtundi. Package lo `..` pedithe, aa package and daani sub-packages anni match avtayi.
+    *   **Example:** `execution(* com.example.service..*.*(..))`
+        *   **Meaning:** `com.example.service` package lo or daani sub-packages lo unna ఏ class loನైనా, ఏ method (any method name, any return type, any number of arguments) ayina match avtundi.
 
-#### 1. `execution` - The Superstar 🌟
+2.  `within`
+    *   Idi `execution` kanna konchem simple. Idi oka particular class or package lo unna anni methods ni match chestundi.
+    *   **Example:** `within(com.example.service..*)`
 
-This is the most common and powerful designator. You'll use it 90% of the time. It matches method executions based on their signature.
+3.  `@annotation`
+    *   Idi chala useful mawa. Oka specific annotation unna methods ni matrame match chestundi.
+    *   **Example:** `@annotation(com.example.annotations.Loggable)` - `@Loggable` annotation unna methods anni match avtayi.
 
-**Syntax:** `execution(modifiers? return-type package.class.method(params) throws?)`
+4.  `bean` **(Spring Special)**
+    *   Idi Spring matrame iche special designator. Bean name tho match chestundi.
+    *   **Example:** `bean(*ServiceImpl)` - `ServiceImpl` tho end ayye anni bean names ni match chestundi.
 
-*   `modifiers`: `public`, `private`, etc. (optional)
-*   `return-type`: The method's return type. `*` means any return type.
-*   `package.class.method`: The full method path. You can use wildcards:
-    *   `*`: matches one word (e.g., `*Service`, `get*`)
-    *   `..`: matches any number of packages (e.g., `io.mawa..*`)
-*   `(params)`: The method parameters.
-    *   `()`: matches a method with no parameters.
-    *   `(..)`: matches a method with zero or more parameters of any type.
-    *   `(*)`: matches a method with exactly one parameter of any type.
-    *   `(*, String)`: matches a method with two parameters, the first of any type, the second a `String`.
+### Combining Pointcuts
 
-**Example:**
-`execution(public String io.mawa.spring..*Service.get*(..))`
-*This matches any public method starting with "get", returning a `String`, in any class ending with "Service" inside the `io.mawa.spring` package or its sub-packages, with any number of parameters.*
-
-#### 2. `within` - The Location Scout 🗺️
-
-This is simpler than `execution`. It matches all methods **within** a certain class or package.
-
-**Example:**
-`within(io.mawa.spring.core.aop..*)`
-*This matches every single method execution inside any class in the `io.mawa.spring.core.aop` package or its sub-packages.*
-
-#### 3. `@annotation` - The Tag Hunter 🏷️
-
-This matches methods that have a specific annotation. This is super useful for creating custom markers.
-
-**Example:**
-Let's say you have a custom annotation `@Loggable`.
-`@annotation(io.mawa.spring.core.aop.Loggable)`
-*This pointcut will match any method that you annotate with `@Loggable`.*
-
-#### 4. `bean` - The Spring Special ✨
-
-This is a special designator provided only by Spring AOP. It lets you target beans by their name in the Spring container.
-
-**Example:**
-`bean(*Service)`
-*This matches all methods on any bean whose name ends with "Service".*
-
----
-
-### Combining Pointcuts (Creating the Master Plan)
-
-You can combine these simple pointcuts to create very powerful and precise rules, just like a real shooting schedule. Use standard logical operators:
-
-*   `&&` (AND)
-*   `||` (OR)
-*   `!` (NOT)
-
-**Best Practice:** Define small, named pointcuts and combine them. It makes your code so much cleaner!
+Chinna chinna pointcuts ni `&&` (AND), `||` (OR), `!` (NOT) lanti logical operators tho combine chesi, chala powerful and specific rules rayochu.
 
 ```java
 @Aspect
 @Component
-public class LoggingAspect {
+public class SystemArchitecture {
 
-    // 1. Pointcut for all methods in the BusinessService
-    @Pointcut("within(io.mawa.spring..*Service)")
+    @Pointcut("within(com.example.web..*)")
+    public void inWebLayer() {}
+
+    @Pointcut("within(com.example.service..*)")
     public void inServiceLayer() {}
 
-    // 2. Pointcut for all getter methods
-    @Pointcut("execution(* get*(..))")
-    public void anyGetter() {}
-
-    // 3. Combined Pointcut!
-    @Pointcut("inServiceLayer() && anyGetter()")
-    public void allGettersInServiceLayer() {}
+    // Combined Pointcut: inWebLayer OR inServiceLayer
+    @Pointcut("inWebLayer() || inServiceLayer()")
+    public void webOrServiceLayer() {}
 }
 ```
 
-### Visualizing a Pointcut 📊
+**Best Practice:** Reusable pointcuts ni ila oka separate class lo petti, vere aspects lo use cheskovachu. Idi code ni chala clean ga unchutundi.
 
-Imagine your application has tons of methods. A pointcut acts like a filter to select only the ones you care about.
-
+### Visualizing a Pointcut
+Ee diagram choodu, pointcut ela pani chestundo clear ga ardam avtundi.
 ```mermaid
 graph TD
     subgraph "All Methods in Your Application"
@@ -123,7 +82,7 @@ graph TD
     end
 
     subgraph "Pointcut Expression"
-        P["@Pointcut('execution(* io.mawa..BusinessService.*(..))')"]
+        P["@Pointcut('within(..*BusinessService)')"]
     end
 
     subgraph "Selected Join Points (Methods)"
@@ -140,4 +99,6 @@ graph TD
     P -- ignores --> F;
 ```
 
-That's the essence of it, mawa! A pointcut is our "WHERE". We haven't said *what* to do yet. That's the job of **Advice**, which is our next exciting topic! 😉
+---
+### Mawa's Next Step
+Super! Ippudu manaki "WHERE" (Pointcut) telusu. Next step lo, manam "WHAT" and "WHEN" define cheddam. Ante, **Advice** gurinchi matladukundam. Real action akkade start avtundi!
