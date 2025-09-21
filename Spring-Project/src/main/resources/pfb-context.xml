@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 1. The Advice/Interceptor Bean (Using our custom interceptor) -->
+    <bean id="debugInterceptor" class="io.mawa.spring.core.aopapi.proxyfactorybean.SimpleDebugInterceptor"/>
+
+    <!--
+      2. The ProxyFactoryBean.
+      The target is defined as an anonymous inner bean to avoid ambiguity with autowiring.
+      This way, the only bean of type DocumentService in the context is the proxy itself.
+    -->
+    <bean id="documentService" class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <value>io.mawa.spring.core.aopapi.proxyfactorybean.DocumentService</value>
+        </property>
+
+        <!-- Use inner bean for the target -->
+        <property name="target">
+            <bean class="io.mawa.spring.core.aopapi.proxyfactorybean.DocumentServiceImpl"/>
+        </property>
+
+        <property name="interceptorNames">
+            <list>
+                <value>debugInterceptor</value>
+            </list>
+        </property>
+    </bean>
+
+</beans>
